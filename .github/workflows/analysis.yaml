@@ -36,15 +36,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        command: ${{ fromJson(needs.prepare.outputs.commands) }}
+        job: ${{ fromJson(needs.prepare.outputs.commands) }}
         arch: ['linux/amd64'] # ,'linux/ppc64le','linux/arm64']
         
     container:
       image: ghcr.io/buildsi/spliced-experiment
       options: "--platform=${{ matrix.arch }}"
 
-    name: ${{ matrix.slug }}
+    name: ${{ matrix.job.slug }}
     steps:
+      - name: Show Job Config
+        run: echo ${{ matrix.job }}
       - name: Checkout
         uses: actions/checkout@v3
       - name: Make Space For Build
@@ -55,15 +57,15 @@ jobs:
 
       - name: Run Build
         env:
-          cmd: ${{ matrix.command }}
+          cmd: ${{ matrix.job.command }}
         run: |
-           mkdir -p ${{ matrix.outdir }}
+           mkdir -p ${{ matrix.job.outdir }}
            printf ${cmd}\n"
            ${cmd}
-           cat ${{ matrix.outfile }}
+           cat ${{ matrix.job.outfile }}
 
       - name: Save result artifact
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.slug }}
-          path: ${{ matrix.outfile }}
+          name: ${{ matrix.job.slug }}
+          path: ${{ matrix.job.outfile }}
