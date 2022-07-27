@@ -1,0 +1,69 @@
+name: Spliced Analysis
+on:
+  workflow_dispatch: 
+    inputs:
+      package_pattern:
+        description: 'Name of experiment.yaml pattern (in buildsi/spliced-experiment splices) to test.'
+        required: true
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest    
+    permissions:
+      packages: read
+    outputs:
+      commands: ${{ steps.generate.outputs.commands }}
+    name: Generate Matrix
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          name: buildsi/spliced-experiment         
+      - name: Generate matrix
+        id: generate
+        env:
+          pattern: ${{ github.event.inputs.package_pattern }}
+        run: |
+           mkdir -p ./results
+           python scripts/submit_jobs.py ./splices/ ./results/ --pattern ${pattern} --json
+            
+  build:
+    runs-on: ubuntu-latest
+    needs:
+      - prepare
+    permissions:
+      packages: read
+    strategy:
+      fail-fast: false
+      matrix:
+        command: ${{ fromJson(needs.prepare.outputs.commands) }}
+        arch: ['linux/amd64'] # ,'linux/ppc64le','linux/arm64']
+        
+    container:
+      image: ghcr.io/buildsi/spliced-experiment
+      options: "--platform=${{ matrix.arch }}"
+
+    name: ${{ matrix.slug }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Make Space For Build
+        run: |        
+          ls /usr/share
+          rm -rf /usr/share/dotnet
+          rm -rf /opt/ghc
+
+      - name: Run Build
+        env:
+          cmd: ${{ matrix.command }}
+        run: |
+           mkdir -p ${{ matrix.outdir }}
+           printf ${cmd}\n"
+           ${cmd}
+           cat ${{ matrix.outfile }}
+
+      - name: Save result artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.slug }}
+          path: ${{ matrix.outfile }}
