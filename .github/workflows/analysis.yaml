@@ -58,9 +58,10 @@ jobs:
       - name: Run Build
         env:
           cmd: ${{ matrix.job.command }}
+          outfile:
         run: |
            mkdir -p ${{ matrix.job.outdir }}
-           printf ${cmd}\n"
+           printf "${cmd}\n"
            ${cmd}
            cat ${{ matrix.job.outfile }}
 
