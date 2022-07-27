@@ -18,7 +18,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          name: buildsi/spliced-experiment         
+          repository: buildsi/splice-experiment         
       - name: Generate matrix
         id: generate
         env:
