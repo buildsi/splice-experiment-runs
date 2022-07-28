@@ -80,3 +80,9 @@ jobs:
         with:
           name: ${{ matrix.job.slug }}
           path: ${{ matrix.job.outfile }}
+
+      - name: Save cache
+        uses: actions/upload-artifact@v3
+        with:
+          name: cache-${{ matrix.job.slug }}
+          path: /cache
