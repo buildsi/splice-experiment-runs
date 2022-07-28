@@ -46,7 +46,11 @@ jobs:
     name: ${{ matrix.job.slug }}
     steps:
       - name: Show Job Config
-        run: echo ${{ matrix.job }}
+        run: |
+           echo ${{ matrix.job.command }}
+           echo ${{ matrix.job.outfile }}
+           echo ${{ matrix.job.slug }}
+
       - name: Checkout
         uses: actions/checkout@v3
       - name: Make Space For Build
