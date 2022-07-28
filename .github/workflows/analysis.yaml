@@ -79,7 +79,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.job.slug }}
-          path: ${{ matrix.job.outfile }}
+          path: /results
 
       - name: Save Smeagle Cache
         uses: actions/upload-artifact@v3
