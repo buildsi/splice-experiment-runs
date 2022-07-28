@@ -55,6 +55,11 @@ jobs:
           rm -rf /usr/share/dotnet
           rm -rf /opt/ghc
 
+      - name: Spack install cache
+        uses: actions/cache@v3
+        with:
+          path: /spack/opt
+
       - name: Run Build
         env:
           cmd: ${{ matrix.job.command }}
