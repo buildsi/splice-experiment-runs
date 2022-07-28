@@ -58,6 +58,7 @@ jobs:
       - name: Spack install cache
         uses: actions/cache@v3
         with:
+          key: spack-opt-v1
           path: /spack/opt
 
       - name: Run Build
