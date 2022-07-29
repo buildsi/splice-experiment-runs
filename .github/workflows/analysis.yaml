@@ -59,11 +59,11 @@ jobs:
           rm -rf /usr/share/dotnet
           rm -rf /opt/ghc
 
-      #- name: Spack install cache
-      #  uses: actions/cache@v3
-      #  with:
-      #    key: spack-opt-v1
-      #    path: /spack/opt
+      - name: Spack install cache
+        uses: actions/cache@v3
+        with:
+          key: spack-opt-v1-${{ matrix.job.slug }}
+          path: /spack/opt
 
       - name: Run Build
         env:
