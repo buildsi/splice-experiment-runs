@@ -48,7 +48,7 @@ jobs:
         arch: ['linux/amd64'] # ,'linux/ppc64le','linux/arm64']
         
     container:
-      image: ghcr.io/buildsi/spliced-experiment
+      image: ghcr.io/buildsi/spliced-experiment:0.0.12
       options: "--platform=${{ matrix.arch }}"
 
     name: ${{ matrix.job.slug }}
