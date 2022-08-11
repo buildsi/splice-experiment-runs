@@ -65,57 +65,17 @@ jobs:
       - name: Update container base with predictors and spliced
         uses: buildsi/smeagle-examples/actions/install@breakages/enum
 
-      - name: Run Build
+      - name: Update container base with predictors and spliced
+        uses: buildsi/smeagle-examples/actions/test@breakages/enum
+
+      - name: Run Unit Tests with Spliced
         env:
-          SPLICED_SMEAGLE_CACHE_DIR: /cache
-          SPLICED_ABILAB_CACHE_DIR: /cache
-          CXX: ${{ matrix.container[1] }}
-          compiler: ${{ matrix.container[2] }}
-          skip_smeagle: ${{ github.event.inputs.skip_smeagle }}
-        run: |
-           root=$PWD           
-           export PATH=/usr/local/bin:${PWD}:/${PWD}/actions/scripts:/usr/bin:$PATH
-           mkdir -p /tmp/diff-results /cache
-           ls
-           rm -rf _development
-           CXX=${CXX} /bin/bash build.sh
-           for category in $(ls -d */); do
-               printf "Inspecting category ${category}\n"
-               cd ${root}/${category}
-               ls
-               original=example
-               if ! test -f ${original}; then
-                   original=lib.so
-               fi
-               original=$(realpath ${original})
-               printf "Found libA ${original}\n"
-               if test -d ./breaks; then
-                   for dir in $(ls ./breaks); do
-                       printf "Looking at break ${dir}\n"
-                       break_dir=${root}/${category}/breaks/${dir}
-                       cd ${break_dir}
-                       ls
-                       splice="example"
-                       if ! test -f ${splice}; then
-                           splice=lib.so
-                       fi
-                       splice=$(realpath ${splice})
-                       printf "Found libB ${splice}\n"
-                       outdir="/tmp/diff-results/${category}${dir}/${compiler}"
-                       mkdir -p ${outdir}
-                       experiment=${original}-${splice}-${compiler}
-                       outfile="${outdir}/experiment.json"
-                       echo ${compiler} >> ${outdir}/compiler.txt
-                       cmd="spliced diff --package ${original} --splice ${splice} --experiment ${experiment} --runner manual --outfile ${outfile} --skip spack-test" 
-                       if [ "${skip_smeagle}" == "true" ]; then
-                           cmd="${cmd} --skip-smeagle"
-                       fi
-                       printf "${cmd}\n"
-                       ${cmd}
-                       cat ${outfile}
-                   done
-               fi
-           done
+          cache_dir: /cache
+          results_dir: /tmp/diff-results
+          cxx: ${{ matrix.container[1] }} 
+          compiler: ${{ matrix.container[2] }} 
+          skip_smeagle: ${{ github.event.inputs.skip_smeagle }}       
+
       - name: Save result artifact
         uses: actions/upload-artifact@v3
         with:
