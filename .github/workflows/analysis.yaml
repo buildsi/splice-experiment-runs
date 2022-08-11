@@ -74,7 +74,7 @@ jobs:
                fi
                cd ${category}
                original=example
-               if ! test -f "${original}; then
+               if ! test -f ${original}; then
                    original=lib.so
                fi
                original=$(realpath ${original})
@@ -82,7 +82,7 @@ jobs:
                    for dir in $(ls ./breaks); do
                        printf "Looking at break ${dir}\n"
                        splice="$dir/example"
-                       if ! test -f "${splice}"; then
+                       if ! test -f ${splice}; then
                            splice=lib.so
                        fi
                        splice=$(realpath ${splice})
