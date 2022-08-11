@@ -106,7 +106,7 @@ jobs:
         run: |
            root=$PWD
            ls
-           mkdir -p ./diff-results
+           mkdir -p /tmp/diff-results
            rm -rf _development
            for category in $(ls -d */); do
                printf "Inspecting category ${category}\n"
@@ -128,7 +128,7 @@ jobs:
                        fi
                        splice=$(realpath ${splice})
                        printf "Found libB ${splice}\n"
-                       outdir="../diff-results/${category}/${dir}/${CC}"
+                       outdir="/tmp/diff-results/${category}/${dir}/${CC}"
                        mkdir -p ${outdir}
                        outfile="${outdir}/experiment.json"
                        echo ${compiler} >> ${outdir}/compiler.txt
@@ -146,7 +146,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.job.container[2] }}
-          path: /diff-results
+          path: /tmp/diff-results
 
       - name: Save Smeagle Cache
         uses: actions/upload-artifact@v3
