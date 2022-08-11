@@ -61,43 +61,9 @@ jobs:
           repository: buildsi/smeagle-examples
           ref: breakages/enum
 
+        # Install deps cle, abi-laboratory, spliced, etc. into container
       - name: Update container base with predictors and spliced
-        run: |
-          apt-get update && apt-get install -y build-essential python3-pip libssl-dev vtable-dumper 
-          alias pip='pip3'
-          pip install --upgrade pip 
-
-          pip install ipython
-          CMAKE_VERSION=3.20.4
-          curl -s -L https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION/cmake-$CMAKE_VERSION-linux-x86_64.sh > cmake.sh
-          sh cmake.sh --prefix=/usr/local --skip-license
-          rm cmake.sh
-
-          git clone https://github.com/vsoch/cle && \
-          cd cle && \
-
-          # archinfo, pyvex, pyelftools, then cle
-          pip install wheel && \
-          pip install git+https://github.com/angr/archinfo && \
-          pip install git+https://github.com/angr/pyvex && \
-          pip install git+https://github.com/eliben/pyelftools && \
-          pip install .
-          pip install git+https://github.com/vsoch/elfcall@tweaks
-          pip install git+https://github.com/buildsi/spliced@add/diff
-          cd ../
-          rm -rf ./cle
-
-          # Install abi-laboratory tools
-          git clone https://github.com/lvc/abi-dumper && \
-          cd abi-dumper && \
-          make install prefix=/usr && \
-          cd ../ && \
-          rm -rf abi-dumper && \
-          git clone https://github.com/lvc/abi-compliance-checker && \
-          cd abi-compliance-checker && \
-          make install prefix=/usr && \
-          cd ../ && \
-          rm -rf ./abi-compliance-checker
+        uses: buildsi/smeagle-examples/actions/install@breakages/enum
 
       - name: Run Build
         env:
@@ -108,8 +74,7 @@ jobs:
           skip_smeagle: ${{ github.event.inputs.skip_smeagle }}
         run: |
            root=$PWD           
-           export PATH=/usr/local/bin:${PWD}:/usr/bin:$PATH
-           chmod +x run_abi_laboratory.sh
+           export PATH=/usr/local/bin:${PWD}:/${PWD}/actions/scripts:/usr/bin:$PATH
            mkdir -p /tmp/diff-results /cache
            ls
            rm -rf _development
