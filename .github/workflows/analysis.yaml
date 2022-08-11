@@ -58,7 +58,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: buildsi/smeagle-examples
-          ref: breakages/enum
+          ref: thaines/breakages/enum
 
         # Install deps cle, abi-laboratory, spliced, etc. into container
       - name: Update container base with predictors and spliced
