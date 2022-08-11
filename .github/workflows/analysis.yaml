@@ -62,7 +62,7 @@ jobs:
 
       - name: Update container base with predictors and spliced
         run: |
-          apt-get update && apt-get install -y build-essential gfortran patchelf unzip bzip2 python3-pip libssl-dev vtable-dumper 
+          apt-get update && apt-get install -y build-essential python3-pip libssl-dev vtable-dumper 
           alias pip='pip3'
 
           pip install ipython
