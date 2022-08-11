@@ -111,7 +111,6 @@ jobs:
            for category in $(ls -d */); do
                printf "Inspecting category ${category}\n"
                cd ${root}/${category}
-               make CC=${CC}
                original=example
                if ! test -f ${original}; then
                    original=lib.so
@@ -121,8 +120,10 @@ jobs:
                if test -d ./breaks; then
                    for dir in $(ls ./breaks); do
                        printf "Looking at break ${dir}\n"
-                       make CC=${CC} -C ${dir}
-                       splice="$dir/example"
+                       cd ${dir}
+                       ls
+                       make CC=${CC}
+                       splice="example"
                        if ! test -f ${splice}; then
                            splice=lib.so
                        fi
@@ -137,7 +138,6 @@ jobs:
                            cmd="${cmd} --skip-smeagle"
                        fi
                        printf "${cmd}\n"
-                       ${cmd}
                        cat ${outfile}
                    done
                fi
