@@ -123,7 +123,7 @@ jobs:
                        mkdir -p ${outdir}
                        outfile="${outdir}/experiment.json"
                        echo ${compiler} >> ${outdir}/compiler.txt
-                       cmd="spliced diff --package ${original} --splice ${splice} --outfile ${outfile}"   
+                       cmd="spliced diff --package ${original} --splice ${splice} --runner manual --outfile ${outfile} --skip spack-test" 
                        if [[ "${skip_smeagle}" == "true" ]]; then
                            cmd="${cmd} --skip-smeagle"
                        fi
