@@ -66,22 +66,23 @@ jobs:
           skip_smeagle: ${{ github.event.inputs.skip_smeagle }}
         run: |
            mkdir -p ./diff-results
+           make CC=${CC}
            for category in $(ls -d */); do
+               printf "Inspecting category ${category}\n"
                if [[ "${category}" == "_development" ]]; then
                    continue
                fi
-               make CC=${CC}
                cd ${category}
                original=example
-               if [[ ! -f "${original}" ]]; then
+               if ! test -f "${original}; then
                    original=lib.so
                fi
                original=$(realpath ${original})
-               if [[ -d "breaks" ]]; then
+               if test -d ./breaks; then
                    for dir in $(ls ./breaks); do
                        printf "Looking at break ${dir}\n"
                        splice="$dir/example"
-                       if [[ ! -f "${splice}" ]]; then
+                       if ! test -f "${splice}"; then
                            splice=lib.so
                        fi
                        splice=$(realpath ${splice})
