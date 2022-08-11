@@ -1,5 +1,6 @@
 name: Spliced Analysis
 on:
+  pull_request: []
   workflow_dispatch: 
     inputs:
       package_pattern:
@@ -21,19 +22,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          repository: buildsi/splice-experiment         
+          repository: buildsi/smeagle-examples
+          ref: thaines/breakages/enum
       - name: Generate matrix
         id: generate
         env:
-          pattern: ${{ github.event.inputs.package_pattern }}
           skip_smeagle: ${{ github.event.inputs.skip_smeagle }}
         run: |
-           mkdir -p ./results
-           if [[ "${skip_smeagle}" == "true" ]]; then
-               python scripts/submit_jobs.py ./diffs/ ./results/ --pattern ${pattern} --skip-smeagle --json
-           else
-               python scripts/submit_jobs.py ./diffs/ ./results/ --pattern ${pattern} --json
-           fi 
+           mkdir -p ./diff-results
+           python matrix.py
            
   build:
     runs-on: ubuntu-latest
@@ -45,52 +42,87 @@ jobs:
       fail-fast: false
       matrix:
         job: ${{ fromJson(needs.prepare.outputs.commands) }}
-        arch: ['linux/amd64'] # ,'linux/ppc64le','linux/arm64']
+        # container, compiler inside to use, and name+version to save
+        container: [['ghcr.io/buildsi/libabigail:latest', 'gcc' , 'gcc-11.2.0'],
+                    ['ghcr.io/buildsi/libabigail:latest', 'g++' , 'g++-11.2.0'],
+                    ['ghcr.io/buildsi/libabigail:latest', 'clang' , 'clang-14.0.0'],
+                    ['ghcr.io/buildsi/llvm:llvm-3.3', 'clang', 'clang-3.3'],
+                    ['ghcr.io/buildsi/llvm:llvm-4', 'clang', 'clang-4'],
+                    ['ghcr.io/buildsi/llvm:llvm-5', 'clang', 'clang-5'],
+                    ['ghcr.io/buildsi/llvm:llvm-6', 'clang', 'clang-6'],
+                    ['ghcr.io/buildsi/llvm:llvm-7', 'clang', 'clang-7'],
+                    ['ghcr.io/buildsi/llvm:llvm-8', 'clang', 'clang-8'],
+                    ['ghcr.io/buildsi/llvm:llvm-9', 'clang', 'clang-8'],
+                    ['ghcr.io/buildsi/llvm:llvm-10', 'clang', 'clang-10'],
+                    ['ghcr.io/buildsi/llvm:llvm-11', 'clang', 'clang-11'],
+                    ['ghcr.io/buildsi/llvm:llvm-12', 'clang', 'clang-12'],
+                    ['ghcr.io/buildsi/llvm:llvm-13', 'clang', 'clang-13'],
+                    ['ghcr.io/buildsi/llvm:llvm-14', 'clang', 'clang-14']]
         
     container:
-      image: ghcr.io/buildsi/spliced-experiment:0.0.12
-      options: "--platform=${{ matrix.arch }}"
+      image: ${{ matrix.container[0] }}
+      options: "--platform=linux/amd64"
 
-    name: ${{ matrix.job.slug }}
+    name: ${{ matrix.job.root }} ${{ matrix.container[2] }}
     steps:
       - name: Show Job Config
         run: |
-           echo ${{ matrix.job.command }}
-           echo ${{ matrix.job.outfile }}
-           echo ${{ matrix.job.slug }}
+           echo ${{ matrix.job.root }}
+           echo ${{ matrix.container[0] }}
+           echo ${{ matrix.container[1] }}
+           echo ${{ matrix.container[2] }}
 
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Make Space For Build
+      - name: Make Space For Build2
         run: |        
           ls /usr/share
           rm -rf /usr/share/dotnet
           rm -rf /opt/ghc
 
-      - name: Spack install cache
-        uses: actions/cache@v3
-        with:
-          key: spack-opt-v1-${{ matrix.job.slug }}
-          path: /spack/opt
-
       - name: Run Build
         env:
-          cmd: ${{ matrix.job.command }}
-          outfile:
+          CC: ${{ matrix.container[1] }}
+          compiler: ${{ matrix.container[2] }}
+          skip_smeagle: ${{ github.event.inputs.skip_smeagle }}
         run: |
-           mkdir -p ${{ matrix.job.outdir }}
-           printf "${cmd}\n"
-           ${cmd}
-           cat ${{ matrix.job.outfile }}
-
+           mkdir -p ./diff-results
+           cd ${{ matrix.job.root }}
+           category=$(basename ${{ matrix.job.root }})
+           make CC=${CC}
+           original=example
+           if [[ ! -f "${original}" ]]; then
+               original=lib.so
+           fi
+           original=$(realpath ${original})
+           if [[ -d "breaks" ]]; then
+               for dir in $(ls ./breaks); do
+                   printf "Looking at break ${dir}\n"
+                   splice="$dir/example"
+                   if [[ ! -f "${splice}" ]]; then
+                       splice=lib.so
+                   fi
+                   splice=$(realpath ${splice})
+                   outdir="../diff-results/${category}/${dir}"
+                   outfile="../diff-results/${category}/${dir}/${CC}.json"
+                   echo ${compiler} >> ${outdir}/compiler.txt
+                   cmd="spliced diff --package ${original} --splice ${splice} --outfile ${outfile}"   
+                   if [[ "${skip_smeagle}" == "true" ]]; then
+                       cmd="${cmd} --skip-smeagle"
+                   fi
+                   printf "${cmd}\n"
+                   ${cmd}
+                   cat ${outfile}
+               done
+           fi
       - name: Save result artifact
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.job.slug }}
-          path: /results
+          name: ${{ matrix.job.container[2] }}
+          path: /diff-results
 
       - name: Save Smeagle Cache
         uses: actions/upload-artifact@v3
         with:
-          name: cache-smeagle-${{ matrix.job.slug }}
+          name: cache-smeagle-${{ matrix.job.container[2] }}
           path: /cache/smeagle-spack
