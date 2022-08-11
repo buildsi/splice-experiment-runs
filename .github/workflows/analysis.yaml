@@ -65,6 +65,7 @@ jobs:
           compiler: ${{ matrix.container[2] }}
           skip_smeagle: ${{ github.event.inputs.skip_smeagle }}
         run: |
+           root=$PWD
            mkdir -p ./diff-results
            make CC=${CC}
            for category in $(ls -d */); do
@@ -72,7 +73,7 @@ jobs:
                    continue
                fi
                printf "Inspecting category ${category}\n"
-               cd ${category}
+               cd ${root}/${category}
                original=example
                if ! test -f ${original}; then
                    original=lib.so
