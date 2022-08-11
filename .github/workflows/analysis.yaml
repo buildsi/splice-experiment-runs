@@ -70,7 +70,6 @@ jobs:
                if [[ "${category}" == "_development" ]]; then
                    continue
                fi
-               category=$(basename ${{ matrix.job.root }})
                make CC=${CC}
                original=example
                if [[ ! -f "${original}" ]]; then
