@@ -105,6 +105,9 @@ jobs:
           skip_smeagle: ${{ github.event.inputs.skip_smeagle }}
         run: |
            root=$PWD
+           export PATH=/usr/local/bin:/usr/bin:$PATH
+           ls /usr/bin
+           ls /usr/local/bin
            ls
            mkdir -p /tmp/diff-results
            rm -rf _development
