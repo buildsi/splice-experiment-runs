@@ -63,10 +63,10 @@ jobs:
 
         # Install deps cle, abi-laboratory, spliced, etc. into container
       - name: Update container base with predictors and spliced
-        uses: buildsi/smeagle-examples/actions/install@breakages/enum
+        uses: buildsi/smeagle-examples/actions/install@thaines/breakages/enum
 
       - name: Run Unit Tests with Spliced
-        uses: buildsi/smeagle-examples/actions/test@breakages/enum
+        uses: buildsi/smeagle-examples/actions/test@thaines/breakages/enum
         env:
           cache_dir: /cache
           results_dir: /tmp/diff-results
