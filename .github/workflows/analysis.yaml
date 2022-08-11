@@ -68,6 +68,7 @@ jobs:
       - name: Run Unit Tests with Spliced
         uses: buildsi/smeagle-examples/actions/test@thaines/breakages/enum
         env:
+          tests_dir: ./
           cache_dir: /cache
           results_dir: /tmp/diff-results
           cxx: ${{ matrix.container[1] }} 
