@@ -68,16 +68,17 @@ jobs:
            mkdir -p ./diff-results
            make CC=${CC}
            for category in $(ls -d */); do
-               printf "Inspecting category ${category}\n"
                if [[ "${category}" == "_development" ]]; then
                    continue
                fi
+               printf "Inspecting category ${category}\n"
                cd ${category}
                original=example
                if ! test -f ${original}; then
                    original=lib.so
                fi
                original=$(realpath ${original})
+               printf "Found libA ${original}"
                if test -d ./breaks; then
                    for dir in $(ls ./breaks); do
                        printf "Looking at break ${dir}\n"
@@ -86,6 +87,7 @@ jobs:
                            splice=lib.so
                        fi
                        splice=$(realpath ${splice})
+                       printf "Found libB ${splice}"
                        outdir="../diff-results/${category}/${dir}"
                        outfile="../diff-results/${category}/${dir}/${CC}.json"
                        echo ${compiler} >> ${outdir}/compiler.txt
