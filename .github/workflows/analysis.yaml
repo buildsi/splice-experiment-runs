@@ -52,7 +52,6 @@ jobs:
       - name: Run Actions Cleaner
         uses: rse-ops/actions-cleaner/ubuntu@main
         with:
-          # No docker within a container!
           purge_docker: false
 
       - name: Checkout
