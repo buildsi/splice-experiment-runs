@@ -81,15 +81,20 @@ jobs:
           pip install .
           pip install git+https://github.com/vsoch/elfcall@tweaks
           pip install git+https://github.com/buildsi/spliced@add/diff
+          cd ../
+          rm -rf ./cle
 
           # Install abi-laboratory tools
           git clone https://github.com/lvc/abi-dumper && \
           cd abi-dumper && \
           make install prefix=/usr && \
-          cd .. && \
+          cd ../ && \
+          rm -rf abi-dumper && \
           git clone https://github.com/lvc/abi-compliance-checker && \
           cd abi-compliance-checker && \
-          make install prefix=/usr
+          make install prefix=/usr && \
+          cd ../ && \
+          rm -rf ./abi-compliance-checker
 
       - name: Run Build
         env:
