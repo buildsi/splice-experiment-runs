@@ -103,7 +103,7 @@ jobs:
            ls
            mkdir -p ./diff-results
            for category in $(ls -d */); do
-               if [[ "${category}" == "_development" ]]; then
+               if [ "${category}" = "_development" ]; then
                    continue
                fi
                printf "Inspecting category ${category}\n"
