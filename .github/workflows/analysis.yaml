@@ -67,10 +67,9 @@ jobs:
         run: |
            mkdir -p ./diff-results
            for category in $(ls -d */); do
-
                if [[ "${category}" == "_development" ]]; then
                    continue
-               di
+               fi
                category=$(basename ${{ matrix.job.root }})
                make CC=${CC}
                original=example
