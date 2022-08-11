@@ -102,10 +102,8 @@ jobs:
            root=$PWD
            ls
            mkdir -p ./diff-results
+           rm -rf _development
            for category in $(ls -d */); do
-               if [ "${category}" = "_development" ]; then
-                   continue
-               fi
                printf "Inspecting category ${category}\n"
                cd ${root}/${category}
                make CC=${CC}
