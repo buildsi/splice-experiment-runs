@@ -102,7 +102,7 @@ jobs:
         env:
           SPLICED_SMEAGLE_CACHE_DIR: /cache
           SPLICED_ABILAB_CACHE_DIR: /cache
-          CC: ${{ matrix.container[1] }}
+          CXX: ${{ matrix.container[1] }}
           compiler: ${{ matrix.container[2] }}
           skip_smeagle: ${{ github.event.inputs.skip_smeagle }}
         run: |
@@ -112,7 +112,7 @@ jobs:
            mkdir -p /tmp/diff-results /cache
            ls
            rm -rf _development
-           make CC=${CC}
+           CXX=${CXX} /bin/bash build.sh
            for category in $(ls -d */); do
                printf "Inspecting category ${category}\n"
                cd ${root}/${category}
