@@ -66,6 +66,7 @@ jobs:
           skip_smeagle: ${{ github.event.inputs.skip_smeagle }}
         run: |
            root=$PWD
+           ls
            mkdir -p ./diff-results
            make CC=${CC}
            for category in $(ls -d */); do
