@@ -120,7 +120,8 @@ jobs:
                if test -d ./breaks; then
                    for dir in $(ls ./breaks); do
                        printf "Looking at break ${dir}\n"
-                       cd ${dir}
+                       break_dir=${root}/${category}/breaks/${dir}
+                       cd ${break_dir}
                        ls
                        make CC=${CC}
                        splice="example"
