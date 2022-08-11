@@ -65,7 +65,7 @@ jobs:
         uses: buildsi/smeagle-examples/actions/test@main
         with:
           tests_dir: ${{ github.workspace }}
-          cache_dir: /cache
+          cache_dir: /tmp/cache
           results_dir: /tmp/diff-results
           cxx: ${{ matrix.container[1] }} 
           compiler: ${{ matrix.container[2] }} 
