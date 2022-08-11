@@ -104,10 +104,9 @@ jobs:
           compiler: ${{ matrix.container[2] }}
           skip_smeagle: ${{ github.event.inputs.skip_smeagle }}
         run: |
-           root=$PWD
-           export PATH=/usr/local/bin:/usr/bin:$PATH
-           ls /usr/bin
-           ls /usr/local/bin
+           root=$PWD           
+           export PATH=/usr/local/bin:${PWD}:/usr/bin:$PATH
+           chmod +x run_abi_laboratory.sh
            ls
            mkdir -p /tmp/diff-results
            rm -rf _development
