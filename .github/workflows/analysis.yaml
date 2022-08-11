@@ -102,13 +102,13 @@ jobs:
            root=$PWD
            ls
            mkdir -p ./diff-results
-           make CC=${CC}
            for category in $(ls -d */); do
                if [[ "${category}" == "_development" ]]; then
                    continue
                fi
                printf "Inspecting category ${category}\n"
                cd ${root}/${category}
+               make CC=${CC}
                original=example
                if ! test -f ${original}; then
                    original=lib.so
@@ -118,6 +118,7 @@ jobs:
                if test -d ./breaks; then
                    for dir in $(ls ./breaks); do
                        printf "Looking at break ${dir}\n"
+                       make CC=${CC} -C ${dir}
                        splice="$dir/example"
                        if ! test -f ${splice}; then
                            splice=lib.so
