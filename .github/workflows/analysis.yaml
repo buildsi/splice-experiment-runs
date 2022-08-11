@@ -61,8 +61,13 @@ jobs:
 
       - name: Update container base with predictors and spliced
         run: |
-          apt-get update && apt-get install -y build-essential gfortran patchelf unzip bzip2 python3-pip libssl-dev
+          apt-get update && apt-get install -y build-essential gfortran patchelf unzip bzip2 python3-pip libssl-dev vim
           alias pip='pip3'
+
+          pip install ipython
+          curl -s -L https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION/cmake-$CMAKE_VERSION-linux-x86_64.sh > cmake.sh
+          sh cmake.sh --prefix=/usr/local --skip-license
+          rm cmake.sh
 
           git clone https://github.com/vsoch/cle && \
           cd cle && \
@@ -84,10 +89,6 @@ jobs:
           git clone https://github.com/lvc/abi-compliance-checker && \
           cd abi-compliance-checker && \
           make install prefix=/usr
-          pip install ipython && apt-get install -y vim
-          curl -s -L https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION/cmake-$CMAKE_VERSION-linux-x86_64.sh > cmake.sh && \
-          sh cmake.sh --prefix=/usr/local --skip-license && \
-          rm cmake.sh
 
       - name: Run Build
         env:
