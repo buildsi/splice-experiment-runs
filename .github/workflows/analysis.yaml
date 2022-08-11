@@ -61,7 +61,8 @@ jobs:
 
       - name: Update container base with predictors and spliced
         run: |
-          apt-get update && apt-get install -y build-essential gfortran patchelf unzip bzip2
+          apt-get update && apt-get install -y build-essential gfortran patchelf unzip bzip2 python3-pip
+          alias pip='pip3'
 
           git clone https://github.com/vsoch/cle && \
           cd cle && \
