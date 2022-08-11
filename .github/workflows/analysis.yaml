@@ -104,7 +104,7 @@ jobs:
            root=$PWD           
            export PATH=/usr/local/bin:${PWD}:/usr/bin:$PATH
            chmod +x run_abi_laboratory.sh
-           mkdir -p /tmp/diff-results
+           mkdir -p /tmp/diff-results /cache
            ls
            rm -rf _development
            for category in $(ls -d */); do
