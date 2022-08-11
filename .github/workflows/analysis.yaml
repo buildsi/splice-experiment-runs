@@ -59,8 +59,36 @@ jobs:
           rm -rf /usr/share/dotnet
           rm -rf /opt/ghc
 
+      - name: Update container base with predictors and spliced
+        run: |
+          apt-get update && apt-get install -y build-essential gfortran patchelf unzip bzip2
+
+          git clone https://github.com/vsoch/cle && \
+          cd cle && \
+
+          # archinfo, pyvex, pyelftools, then cle
+          pip install wheel && \
+          pip install git+https://github.com/angr/archinfo && \
+          pip install git+https://github.com/angr/pyvex && \
+          pip install git+https://github.com/eliben/pyelftools && \
+          pip install .
+          pip install git+https://github.com/vsoch/elfcall@tweaks
+          pip install git+https://github.com/buildsi/spliced@add/diff
+
+          # Install abi-laboratory tools
+          git clone https://github.com/lvc/abi-dumper && \
+          cd abi-dumper && \
+          make install prefix=/usr && \
+          cd .. && \
+          git clone https://github.com/lvc/abi-compliance-checker && \
+          cd abi-compliance-checker && \
+          make install prefix=/usr
+          pip install ipython && apt-get install -y vim
+
       - name: Run Build
         env:
+          SPLICED_SMEAGLE_CACHE_DIR: /cache
+          SPLICED_ABILAB_CACHE_DIR: /cache
           CC: ${{ matrix.container[1] }}
           compiler: ${{ matrix.container[2] }}
           skip_smeagle: ${{ github.event.inputs.skip_smeagle }}
@@ -80,7 +108,7 @@ jobs:
                    original=lib.so
                fi
                original=$(realpath ${original})
-               printf "Found libA ${original}"
+               printf "Found libA ${original}\n"
                if test -d ./breaks; then
                    for dir in $(ls ./breaks); do
                        printf "Looking at break ${dir}\n"
@@ -89,7 +117,7 @@ jobs:
                            splice=lib.so
                        fi
                        splice=$(realpath ${splice})
-                       printf "Found libB ${splice}"
+                       printf "Found libB ${splice}\n"
                        outdir="../diff-results/${category}/${dir}/${CC}"
                        mkdir -p ${outdir}
                        outfile="${outdir}/experiment.json"
