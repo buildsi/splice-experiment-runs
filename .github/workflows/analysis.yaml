@@ -20,7 +20,7 @@ jobs:
       matrix:
         # container, compiler inside to use, and name+version to save
         container: [['ghcr.io/buildsi/libabigail:latest', 'gcc' , 'gcc-11.2.0'],
-                    ['ghcr.io/buildsi/libabigail:latest', 'g++' , 'g++-11.2.0'],
+                    ['ghcr.io/buildsi/libabigail:latest', 'g++' , 'gpp-11.2.0'],
                     ['ghcr.io/buildsi/libabigail:latest', 'clang' , 'clang-14.0.0'],
                     ['ghcr.io/buildsi/llvm:llvm-3.3', 'clang', 'clang-3.3'],
                     ['ghcr.io/buildsi/llvm:llvm-4', 'clang', 'clang-4'],
@@ -152,7 +152,7 @@ jobs:
       - name: Save result artifact
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.job.container[2] }}
+          name: ${{ matrix.container[2] }}
           path: /tmp/diff-results
 
       - name: Save Smeagle Cache
