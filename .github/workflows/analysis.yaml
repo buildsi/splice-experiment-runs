@@ -81,4 +81,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cache-smeagle-${{ matrix.container[2] }}
-          path: /cache/smeagle-spack
+          path: /tmp/cache
