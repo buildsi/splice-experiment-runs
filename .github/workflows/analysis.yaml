@@ -132,9 +132,10 @@ jobs:
                        printf "Found libB ${splice}\n"
                        outdir="/tmp/diff-results/${category}${dir}/${compiler}"
                        mkdir -p ${outdir}
+                       experiment=${original}-${splice}-${compiler}
                        outfile="${outdir}/experiment.json"
                        echo ${compiler} >> ${outdir}/compiler.txt
-                       cmd="spliced diff --package ${original} --splice ${splice} --runner manual --outfile ${outfile} --skip spack-test" 
+                       cmd="spliced diff --package ${original} --splice ${splice} --experiment ${experiment} --runner manual --outfile ${outfile} --skip spack-test" 
                        if [ "${skip_smeagle}" == "true" ]; then
                            cmd="${cmd} --skip-smeagle"
                        fi
