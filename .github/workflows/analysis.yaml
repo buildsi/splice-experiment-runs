@@ -85,6 +85,9 @@ jobs:
           cd abi-compliance-checker && \
           make install prefix=/usr
           pip install ipython && apt-get install -y vim
+          curl -s -L https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION/cmake-$CMAKE_VERSION-linux-x86_64.sh > cmake.sh && \
+          sh cmake.sh --prefix=/usr/local --skip-license && \
+          rm cmake.sh
 
       - name: Run Build
         env:
