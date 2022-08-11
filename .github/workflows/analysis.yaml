@@ -65,6 +65,7 @@ jobs:
           alias pip='pip3'
 
           pip install ipython
+          CMAKE_VERSION=3.20.4
           curl -s -L https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION/cmake-$CMAKE_VERSION-linux-x86_64.sh > cmake.sh
           sh cmake.sh --prefix=/usr/local --skip-license
           rm cmake.sh
