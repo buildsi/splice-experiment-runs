@@ -111,6 +111,8 @@ jobs:
            for category in $(ls -d */); do
                printf "Inspecting category ${category}\n"
                cd ${root}/${category}
+               make CC=${CC}
+               ls
                original=example
                if ! test -f ${original}; then
                    original=lib.so
@@ -122,8 +124,8 @@ jobs:
                        printf "Looking at break ${dir}\n"
                        break_dir=${root}/${category}/breaks/${dir}
                        cd ${break_dir}
-                       ls
                        make CC=${CC}
+                       ls
                        splice="example"
                        if ! test -f ${splice}; then
                            splice=lib.so
