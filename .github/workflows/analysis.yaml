@@ -51,7 +51,6 @@ jobs:
 
       - name: Make Space For Build
         run: |        
-          ls /usr/share
           rm -rf /usr/share/dotnet
           rm -rf /opt/ghc
 
