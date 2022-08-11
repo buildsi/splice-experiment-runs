@@ -11,37 +11,13 @@ on:
         required: true
         type: boolean
 jobs:
-  prepare:
-    runs-on: ubuntu-latest    
-    permissions:
-      packages: read
-    outputs:
-      commands: ${{ steps.generate.outputs.commands }}
-    name: Generate Matrix
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          repository: buildsi/smeagle-examples
-          ref: thaines/breakages/enum
-      - name: Generate matrix
-        id: generate
-        env:
-          skip_smeagle: ${{ github.event.inputs.skip_smeagle }}
-        run: |
-           mkdir -p ./diff-results
-           python matrix.py
-           
   build:
     runs-on: ubuntu-latest
-    needs:
-      - prepare
     permissions:
       packages: read
     strategy:
       fail-fast: false
       matrix:
-        job: ${{ fromJson(needs.prepare.outputs.commands) }}
         # container, compiler inside to use, and name+version to save
         container: [['ghcr.io/buildsi/libabigail:latest', 'gcc' , 'gcc-11.2.0'],
                     ['ghcr.io/buildsi/libabigail:latest', 'g++' , 'g++-11.2.0'],
@@ -63,18 +39,21 @@ jobs:
       image: ${{ matrix.container[0] }}
       options: "--platform=linux/amd64"
 
-    name: ${{ matrix.job.root }} ${{ matrix.container[2] }}
+    name: ${{ matrix.container[2] }}
     steps:
       - name: Show Job Config
         run: |
-           echo ${{ matrix.job.root }}
            echo ${{ matrix.container[0] }}
            echo ${{ matrix.container[1] }}
            echo ${{ matrix.container[2] }}
 
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Make Space For Build2
+        with:
+          repository: buildsi/smeagle-examples
+          ref: thaines/breakages/enum
+
+      - name: Make Space For Build
         run: |        
           ls /usr/share
           rm -rf /usr/share/dotnet
@@ -87,34 +66,39 @@ jobs:
           skip_smeagle: ${{ github.event.inputs.skip_smeagle }}
         run: |
            mkdir -p ./diff-results
-           cd ${{ matrix.job.root }}
-           category=$(basename ${{ matrix.job.root }})
-           make CC=${CC}
-           original=example
-           if [[ ! -f "${original}" ]]; then
-               original=lib.so
-           fi
-           original=$(realpath ${original})
-           if [[ -d "breaks" ]]; then
-               for dir in $(ls ./breaks); do
-                   printf "Looking at break ${dir}\n"
-                   splice="$dir/example"
-                   if [[ ! -f "${splice}" ]]; then
-                       splice=lib.so
-                   fi
-                   splice=$(realpath ${splice})
-                   outdir="../diff-results/${category}/${dir}"
-                   outfile="../diff-results/${category}/${dir}/${CC}.json"
-                   echo ${compiler} >> ${outdir}/compiler.txt
-                   cmd="spliced diff --package ${original} --splice ${splice} --outfile ${outfile}"   
-                   if [[ "${skip_smeagle}" == "true" ]]; then
-                       cmd="${cmd} --skip-smeagle"
-                   fi
-                   printf "${cmd}\n"
-                   ${cmd}
-                   cat ${outfile}
-               done
-           fi
+           for category in $(ls -d */); do
+
+               if [[ "${category}" == "_development" ]]; then
+                   continue
+               di
+               category=$(basename ${{ matrix.job.root }})
+               make CC=${CC}
+               original=example
+               if [[ ! -f "${original}" ]]; then
+                   original=lib.so
+               fi
+               original=$(realpath ${original})
+               if [[ -d "breaks" ]]; then
+                   for dir in $(ls ./breaks); do
+                       printf "Looking at break ${dir}\n"
+                       splice="$dir/example"
+                       if [[ ! -f "${splice}" ]]; then
+                           splice=lib.so
+                       fi
+                       splice=$(realpath ${splice})
+                       outdir="../diff-results/${category}/${dir}"
+                       outfile="../diff-results/${category}/${dir}/${CC}.json"
+                       echo ${compiler} >> ${outdir}/compiler.txt
+                       cmd="spliced diff --package ${original} --splice ${splice} --outfile ${outfile}"   
+                       if [[ "${skip_smeagle}" == "true" ]]; then
+                           cmd="${cmd} --skip-smeagle"
+                       fi
+                       printf "${cmd}\n"
+                       ${cmd}
+                       cat ${outfile}
+                   done
+               fi
+           done
       - name: Save result artifact
         uses: actions/upload-artifact@v3
         with:
