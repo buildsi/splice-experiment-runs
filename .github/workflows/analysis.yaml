@@ -58,13 +58,12 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: buildsi/smeagle-examples
-          ref: thaines/breakages/enum
 
         # Install deps cle, abi-laboratory, spliced, etc. into container
       - name: Update container base with predictors and spliced
-        uses: buildsi/smeagle-examples/actions/install@thaines/breakages/enum
+        uses: buildsi/smeagle-examples/actions/install@main
       - name: Run Unit Tests with Spliced
-        uses: buildsi/smeagle-examples/actions/test@thaines/breakages/enum
+        uses: buildsi/smeagle-examples/actions/test@main
         with:
           tests_dir: ${{ github.workspace }}
           cache_dir: /cache
