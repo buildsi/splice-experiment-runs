@@ -158,5 +158,5 @@ jobs:
       - name: Save Smeagle Cache
         uses: actions/upload-artifact@v3
         with:
-          name: cache-smeagle-${{ matrix.job.container[2] }}
+          name: cache-smeagle-${{ matrix.container[2] }}
           path: /cache/smeagle-spack
