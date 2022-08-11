@@ -90,8 +90,9 @@ jobs:
                        fi
                        splice=$(realpath ${splice})
                        printf "Found libB ${splice}"
-                       outdir="../diff-results/${category}/${dir}"
-                       outfile="../diff-results/${category}/${dir}/${CC}.json"
+                       outdir="../diff-results/${category}/${dir}/${CC}"
+                       mkdir -p ${outdir}
+                       outfile="${outdir}/experiment.json"
                        echo ${compiler} >> ${outdir}/compiler.txt
                        cmd="spliced diff --package ${original} --splice ${splice} --outfile ${outfile}"   
                        if [[ "${skip_smeagle}" == "true" ]]; then
