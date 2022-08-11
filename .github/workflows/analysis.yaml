@@ -71,6 +71,7 @@ jobs:
                    continue
                fi
                make CC=${CC}
+               cd ${category}
                original=example
                if [[ ! -f "${original}" ]]; then
                    original=lib.so
