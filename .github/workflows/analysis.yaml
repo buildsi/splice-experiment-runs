@@ -26,9 +26,6 @@ jobs:
                     ['ghcr.io/buildsi/gcc:gcc-10.3.0', 'g++', 'gpp-10.3.0'],
                     ['ghcr.io/buildsi/gcc:gcc-9.4.0', 'gcc', 'gcc-9.4.0'],
                     ['ghcr.io/buildsi/gcc:gcc-9.4.0', 'g++', 'gpp-9.4.0'],
-                    ['ghcr.io/buildsi/llvm:llvm-3.3', 'clang', 'clang-3.3'],
-                    ['ghcr.io/buildsi/llvm:llvm-4', 'clang', 'clang-4'],
-                    ['ghcr.io/buildsi/llvm:llvm-5', 'clang', 'clang-5'],
                     ['ghcr.io/buildsi/llvm:llvm-6', 'clang', 'clang-6'],
                     ['ghcr.io/buildsi/llvm:llvm-7', 'clang', 'clang-7'],
                     ['ghcr.io/buildsi/llvm:llvm-8', 'clang', 'clang-8'],
@@ -65,7 +62,7 @@ jobs:
 
       - name: Update container base with predictors and spliced
         run: |
-          apt-get update && apt-get install -y build-essential gfortran patchelf unzip bzip2 python3-pip libssl-dev vim
+          apt-get update && apt-get install -y build-essential gfortran patchelf unzip bzip2 python3-pip libssl-dev vtable-dumper 
           alias pip='pip3'
 
           pip install ipython
@@ -111,7 +108,7 @@ jobs:
            root=$PWD           
            export PATH=/usr/local/bin:${PWD}:/usr/bin:$PATH
            chmod +x run_abi_laboratory.sh
-           mkdir -p /tmp/diff-results
+           mkdir -p /tmp/diff-results /cache
            ls
            rm -rf _development
            for category in $(ls -d */); do
@@ -156,7 +153,7 @@ jobs:
       - name: Save result artifact
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.job.container[2] }}
+          name: ${{ matrix.container[2] }}
           path: /tmp/diff-results
 
       - name: Save Smeagle Cache
