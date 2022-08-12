@@ -4,7 +4,7 @@ on:
   workflow_dispatch: 
     inputs:
       smeagle_examples_branch:
-        description: 'Ref for smeagle examples (defaults to main)'
+        description: 'Ref for smeagle examples data (defaults to main)'
         required: true
         default: main
       skip_smeagle:
@@ -62,9 +62,9 @@ jobs:
 
         # Install deps cle, abi-laboratory, spliced, etc. into container
       - name: Update container base with predictors and spliced
-        uses: buildsi/smeagle-examples/actions/install@${{ github.event.inputs.smeagle_examples_branch }}
+        uses: buildsi/smeagle-examples/actions/install@main
       - name: Run Unit Tests with Spliced
-        uses: buildsi/smeagle-examples/actions/test@${{ github.event.inputs.smeagle_examples_branch }}
+        uses: buildsi/smeagle-examples/actions/test@main
         with:
           tests_dir: ${{ github.workspace }}
           cache_dir: /tmp/cache
