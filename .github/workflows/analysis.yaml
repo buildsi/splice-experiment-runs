@@ -3,9 +3,10 @@ on:
   pull_request: []
   workflow_dispatch: 
     inputs:
-      package_pattern:
-        description: 'Name of experiment.yaml pattern (in buildsi/spliced-experiment splices) to test.'
+      smeagle_examples_branch:
+        description: 'Ref for smeagle examples (defaults to main)'
         required: true
+        default: main
       skip_smeagle:
         description: 'Skip Smeagle if it caused the runs to fail (e.g., memory)'
         required: true
@@ -57,12 +58,13 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: buildsi/smeagle-examples
+          ref: ${{ github.event.inputs.smeagle_examples_branch }}
 
         # Install deps cle, abi-laboratory, spliced, etc. into container
       - name: Update container base with predictors and spliced
-        uses: buildsi/smeagle-examples/actions/install@main
+        uses: buildsi/smeagle-examples/actions/install@${{ github.event.inputs.smeagle_examples_branch }}
       - name: Run Unit Tests with Spliced
-        uses: buildsi/smeagle-examples/actions/test@main
+        uses: buildsi/smeagle-examples/actions/test@${{ github.event.inputs.smeagle_examples_branch }}
         with:
           tests_dir: ${{ github.workspace }}
           cache_dir: /tmp/cache
