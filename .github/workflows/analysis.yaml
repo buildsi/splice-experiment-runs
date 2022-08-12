@@ -4,7 +4,7 @@ on:
   workflow_dispatch: 
     inputs:
       smeagle_examples_branch:
-        description: 'Ref for smeagle examples data (defaults to main)'
+        description: 'Reference for smeagle examples data (defaults to main)'
         required: true
         default: main
       skip_smeagle:
