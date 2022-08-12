@@ -1,96 +1,86 @@
 name: Spliced Analysis
 on:
+  pull_request: []
   workflow_dispatch: 
     inputs:
-      package_pattern:
-        description: 'Name of experiment.yaml pattern (in buildsi/spliced-experiment splices) to test.'
+      smeagle_examples_branch:
+        description: 'Reference for smeagle examples data (defaults to main)'
         required: true
+        default: main
       skip_smeagle:
         description: 'Skip Smeagle if it caused the runs to fail (e.g., memory)'
         required: true
         type: boolean
 jobs:
-  prepare:
-    runs-on: ubuntu-latest    
-    permissions:
-      packages: read
-    outputs:
-      commands: ${{ steps.generate.outputs.commands }}
-    name: Generate Matrix
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          repository: buildsi/splice-experiment         
-      - name: Generate matrix
-        id: generate
-        env:
-          pattern: ${{ github.event.inputs.package_pattern }}
-          skip_smeagle: ${{ github.event.inputs.skip_smeagle }}
-        run: |
-           mkdir -p ./results
-           if [[ "${skip_smeagle}" == "true" ]]; then
-               python scripts/submit_jobs.py ./diffs/ ./results/ --pattern ${pattern} --skip-smeagle --json
-           else
-               python scripts/submit_jobs.py ./diffs/ ./results/ --pattern ${pattern} --json
-           fi 
-           
   build:
     runs-on: ubuntu-latest
-    needs:
-      - prepare
     permissions:
       packages: read
     strategy:
       fail-fast: false
       matrix:
-        job: ${{ fromJson(needs.prepare.outputs.commands) }}
-        arch: ['linux/amd64'] # ,'linux/ppc64le','linux/arm64']
+        # container, compiler inside to use, and name+version to save
+        container: [['ghcr.io/buildsi/ubuntu:ubuntu-18.04', 'gcc' , 'gcc-7.5.0'],
+                    ['ghcr.io/buildsi/ubuntu:ubuntu-18.04', 'g++' , 'gpp-7.5.0'],
+                    ['ghcr.io/buildsi/ubuntu:ubuntu-20.04', 'gcc' , 'gcc-9.4.0'],
+                    ['ghcr.io/buildsi/ubuntu:ubuntu-20.04', 'g++' , 'gpp-9.4.0'],
+                    ['ghcr.io/buildsi/ubuntu:ubuntu-22.04', 'gcc' , 'gcc-11.2.0'],
+                    ['ghcr.io/buildsi/ubuntu:ubuntu-22.04', 'g++' , 'gpp-11.2.0'],                                      
+                    ['ghcr.io/buildsi/intel:intel-2022.2-devel-ubuntu20.04', 'dpcpp', 'dpcpp-2022.2'],
+                    ['ghcr.io/buildsi/llvm:llvm-6', 'clang', 'clang-6'],
+                    ['ghcr.io/buildsi/llvm:llvm-7', 'clang', 'clang-7'],
+                    ['ghcr.io/buildsi/llvm:llvm-8', 'clang', 'clang-8'],
+                    ['ghcr.io/buildsi/llvm:llvm-9', 'clang', 'clang-8'],
+                    ['ghcr.io/buildsi/llvm:llvm-10', 'clang', 'clang-10'],
+                    ['ghcr.io/buildsi/llvm:llvm-11', 'clang', 'clang-11'],
+                    ['ghcr.io/buildsi/llvm:llvm-12', 'clang', 'clang-12'],
+                    ['ghcr.io/buildsi/llvm:llvm-13', 'clang', 'clang-13'],
+                    ['ghcr.io/buildsi/llvm:llvm-14', 'clang', 'clang-14']]
         
     container:
-      image: ghcr.io/buildsi/spliced-experiment:0.0.12
-      options: "--platform=${{ matrix.arch }}"
+      image: ${{ matrix.container[0] }}
+      options: "--platform=linux/amd64"
 
-    name: ${{ matrix.job.slug }}
+    name: ${{ matrix.container[2] }}
     steps:
       - name: Show Job Config
         run: |
-           echo ${{ matrix.job.command }}
-           echo ${{ matrix.job.outfile }}
-           echo ${{ matrix.job.slug }}
+           echo ${{ matrix.container[0] }}
+           echo ${{ matrix.container[1] }}
+           echo ${{ matrix.container[2] }}
 
-      - name: Checkout
-        uses: actions/checkout@v3
       - name: Make Space For Build
         run: |        
-          ls /usr/share
           rm -rf /usr/share/dotnet
           rm -rf /opt/ghc
 
-      - name: Spack install cache
-        uses: actions/cache@v3
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
-          key: spack-opt-v1-${{ matrix.job.slug }}
-          path: /spack/opt
+          repository: buildsi/smeagle-examples
+          ref: ${{ github.event.inputs.smeagle_examples_branch }}
 
-      - name: Run Build
-        env:
-          cmd: ${{ matrix.job.command }}
-          outfile:
-        run: |
-           mkdir -p ${{ matrix.job.outdir }}
-           printf "${cmd}\n"
-           ${cmd}
-           cat ${{ matrix.job.outfile }}
+        # Install deps cle, abi-laboratory, spliced, etc. into container
+      - name: Update container base with predictors and spliced
+        uses: buildsi/smeagle-examples/actions/install@main
+      - name: Run Unit Tests with Spliced
+        uses: buildsi/smeagle-examples/actions/test@main
+        with:
+          tests_dir: ${{ github.workspace }}
+          cache_dir: /tmp/cache
+          results_dir: /tmp/diff-results
+          cxx: ${{ matrix.container[1] }} 
+          compiler: ${{ matrix.container[2] }} 
+          skip_smeagle: ${{ github.event.inputs.skip_smeagle }}       
 
       - name: Save result artifact
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.job.slug }}
-          path: /results
+          name: ${{ matrix.container[2] }}
+          path: /tmp/diff-results
 
       - name: Save Smeagle Cache
         uses: actions/upload-artifact@v3
         with:
-          name: cache-smeagle-${{ matrix.job.slug }}
-          path: /cache/smeagle-spack
+          name: cache-smeagle-${{ matrix.container[2] }}
+          path: /tmp/cache
