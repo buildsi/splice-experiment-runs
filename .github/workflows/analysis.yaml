@@ -21,11 +21,8 @@ jobs:
       matrix:
         # container, compiler inside to use, and name+version to save
         container: [['ghcr.io/buildsi/ubuntu:ubuntu-18.04', 'gcc' , 'gcc-7.5.0'],
-                    ['ghcr.io/buildsi/ubuntu:ubuntu-18.04', 'g++' , 'gpp-7.5.0'],
                     ['ghcr.io/buildsi/ubuntu:ubuntu-20.04', 'gcc' , 'gcc-9.4.0'],
-                    ['ghcr.io/buildsi/ubuntu:ubuntu-20.04', 'g++' , 'gpp-9.4.0'],
                     ['ghcr.io/buildsi/ubuntu:ubuntu-22.04', 'gcc' , 'gcc-11.2.0'],
-                    ['ghcr.io/buildsi/ubuntu:ubuntu-22.04', 'g++' , 'gpp-11.2.0'],                                      
                     ['ghcr.io/buildsi/intel:intel-2022.2-devel-ubuntu20.04', 'dpcpp', 'dpcpp-2022.2'],
                     ['ghcr.io/buildsi/llvm:llvm-6', 'clang', 'clang-6'],
                     ['ghcr.io/buildsi/llvm:llvm-7', 'clang', 'clang-7'],
