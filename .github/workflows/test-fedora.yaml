@@ -40,9 +40,9 @@ jobs:
         run: /bin/bash fedora_installs.sh
 
       - name: Move Fedora Libs
-        run: |
-          mkdir -p ./libs
-          cp -R /lib64/* ./libs/
+        run: 
+          mkdir -p ./libs        
+          python find_libs.py /lib64 ./libs
 
       - name: View Fedora Libs
         run: tree ./libs
