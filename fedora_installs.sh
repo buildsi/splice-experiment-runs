@@ -9,7 +9,7 @@ declare -a libs=("libadwaita-qt5" "aspell" "boost-log", "clucene-core" "libdap" 
 
 # failed could not find "libicu67" (removed)
 
-dnf install -y findutils
+dnf install -y findutils tree
 for lib in "${libs[@]}"; do
    printf "dnf install ${lib}\n"
    dnf install -y ${lib}
