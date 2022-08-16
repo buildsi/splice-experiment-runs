@@ -6,8 +6,8 @@ set -eu -o pipefail
 export PATH=/opt/conda/bin:$HOME/.local/bin:$PATH
 
 lib=$1
-A=first/$lib
-B=second/$lib
+A=$(realpath ./first/$lib)
+B=$(realpath ./second/$lib)
 
 # Check if exists in first and second
 if [ ! -e "${A}" ]; then
@@ -29,7 +29,6 @@ printf "Cache: ${cache_dir}\n"
 
 export PATH=/usr/local/bin:${HOME}/.local/bin:/usr/bin:$PATH
 ls
-
 
 printf "Comparing ${A} vs ${B}\n"
 outdir="${results_dir}/fedora/${lib}"

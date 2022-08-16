@@ -104,6 +104,11 @@ jobs:
                     ["fedora-libs-35", "fedora-libs-37"],
                     ["fedora-libs-36", "fedora-libs-37"]]
 
+    # Any base container will do, we already have the libs!
+    container:
+      image: ghcr.io/buildsi/ubuntu:ubuntu-22.04
+      options: "--platform=linux/amd64"
+
     name: ${{ matrix.artifacts[0] }} vs ${{ matrix.artifacts[1] }} ${{ matrix.lib }}
     steps:
     - name: Make More Room
