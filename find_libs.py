@@ -5,6 +5,7 @@ import sys
 import fnmatch
 import shutil
 
+
 def recursive_find(base, pattern="*.so"):
     for root, _, filenames in os.walk(base):
         for filename in fnmatch.filter(filenames, pattern):

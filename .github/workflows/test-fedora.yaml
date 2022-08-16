@@ -103,7 +103,20 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Compare Matching Libs
-      run: /bin/bash test_libs.py ./first ./second
+      run: |
+        # Ensure we can see Python installs
+        export PATH=/opt/conda/bin:$HOME/.local/bin:$PATH
+        results_dir=/tmp/results
+        cache_dir=/tmp/cache
+        mkdir -p ${results_dir} ${cache_dir}
+        export SPLICED_SMEAGLE_CACHE_DIR=${cache_dir}
+        export SPLICED_ABILAB_CACHE_DIR=${cache_dir}
+        printf "Results: ${results_dir}\n"
+        printf "Cache: ${cache_dir}\n"
+        export PATH=/usr/local/bin:${HOME}/.local/bin:/usr/bin:$PATH
+        outdir="${results_dir}/fedora"
+        mkdir -p ${outdir}
+        python3 test_libs.py ./first ./second ${{ matrix.artifacts[0] }} ${{ matrix.artifacts[1] }} ${outfile}
 
     - name: Save result artifact
       uses: actions/upload-artifact@v3
