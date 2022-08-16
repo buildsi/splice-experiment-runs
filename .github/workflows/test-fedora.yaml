@@ -42,7 +42,7 @@ jobs:
       - name: Move Fedora Libs
         run: |
           mkdir -p ./libs
-          cp -R /lib64 ./libs
+          cp -R /lib64/* ./libs/
 
       - name: View Fedora Libs
         run: tree ./libs
