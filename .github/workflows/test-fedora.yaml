@@ -120,6 +120,6 @@ jobs:
 
     - name: Save result artifact
       uses: actions/upload-artifact@v3
-        with:
+      with:
          name: ${{ matrix.artifacts[0] }}-vs-${{ matrix.artifacts[1] }}
          path: /tmp/results
