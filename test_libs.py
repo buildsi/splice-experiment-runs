@@ -18,7 +18,7 @@ def recursive_find(base, pattern="*.so"):
 
 
 def get_prefix(lib):
-    return os.path.basename(lib).split(".so", 1)[0]
+    return os.path.basename(lib).split(".", 1)[0]
 
 
 def main(first, second, os_a, os_b, outdir):
