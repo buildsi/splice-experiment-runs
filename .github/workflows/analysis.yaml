@@ -1,6 +1,6 @@
 name: Spliced Analysis
 on:
-  pull_request: []
+#  pull_request: []
   workflow_dispatch: 
     inputs:
       smeagle_examples_branch:
