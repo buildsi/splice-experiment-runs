@@ -59,42 +59,42 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        lib: ["/lib64/libadwaitaqtpriv.so",
-              "/lib64/libaspell.so",
-              "/lib64/libboost_log.so",
-              "/lib64/libclucene-core.so",
-              "/lib64/libdap.so",
-              "/lib64/libdcerpc-samr.so",
-              "/lib64/libdjvulibre.so",
-              "/lib64/dovecot/libdovecot-storage.so",
-              "/lib64/libexiv2.so",
-              "/lib64/libgdal.so",
-              "/lib64/libgeos.so",
-              "/lib64/libglibmm-2.4.so",
-              "/lib64/mozilla/plugins/gmp-gmpopenh264/system-installed/libgmpopenh264.so",
-              "/lib64/libhdf5_cpp.so",
-              "/lib64/libicui18n.so",
-              "/lib64/libicuuc.so",
-              "/lib64/dyninst/libinstructionAPI.so",
-              "/lib64/libjavascriptcoregtk-4.0.so",
-              "/lib64/libjxl.so",
-              "/lib64/libkmldom.so",
-              "/lib64/libmusicbrainz5.so",
-              "/lib64/libOpenEXRUtil-3_1.so",
-              "/lib64/libopenh264.so",
-              "/lib64/libOSMesa.so",
-              "/lib64/libproj.so",
-              "/lib64/libQt5WaylandClient.so",
-              "/lib64/libQt5WaylandCompositor.so",
-              "/lib64/libQt5XmlPatterns.so",
-              "/lib64/libSDL2_image-2.0.so",
-              "/lib64/libstdc++.so",
-              "/lib64/libtag.so",
-              "/lib64/libreoffice/program/libuno_cppuhelpergcc3.so",
-              "/lib64/libvtkRenderingCore.so",
-              "/lib64/libwebrtc_audio_processing.so",
-              "/lib64/libicui18n.so",
-              "/lib64/libicuuc.so"]
+        lib: ["libadwaitaqtpriv.so",
+              "libaspell.so",
+              "libboost_log.so",
+              "libclucene-core.so",
+              "libdap.so",
+              "libdcerpc-samr.so",
+              "libdjvulibre.so",
+              "dovecot/libdovecot-storage.so",
+              "libexiv2.so",
+              "libgdal.so",
+              "libgeos.so",
+              "libglibmm-2.4.so",
+              "mozilla/plugins/gmp-gmpopenh264/system-installed/libgmpopenh264.so",
+              "libhdf5_cpp.so",
+              "libicui18n.so",
+              "libicuuc.so",
+              "dyninst/libinstructionAPI.so",
+              "libjavascriptcoregtk-4.0.so",
+              "libjxl.so",
+              "libkmldom.so",
+              "libmusicbrainz5.so",
+              "libOpenEXRUtil-3_1.so",
+              "libopenh264.so",
+              "libOSMesa.so",
+              "libproj.so",
+              "libQt5WaylandClient.so",
+              "libQt5WaylandCompositor.so",
+              "libQt5XmlPatterns.so",
+              "libSDL2_image-2.0.so",
+              "libstdc++.so",
+              "libtag.so",
+              "libreoffice/program/libuno_cppuhelpergcc3.so",
+              "libvtkRenderingCore.so",
+              "libwebrtc_audio_processing.so",
+              "libicui18n.so",
+              "libicuuc.so"]
 
         # Artifact pairs (named) for comparison)
         artifacts: [["fedora-libs-34", "fedora-libs-35"],
@@ -106,6 +106,11 @@ jobs:
 
     name: ${{ matrix.artifacts[0] }} vs ${{ matrix.artifacts[1] }} ${{ matrix.lib }}
     steps:
+    - name: Make More Room
+      run: |        
+        rm -rf /usr/share/dotnet
+        rm -rf /opt/ghc
+
     - name: Download First Version
       uses: actions/download-artifact@v2
       with:
@@ -118,18 +123,20 @@ jobs:
         name: ${{ matrix.artifacts[1] }}
         path: second/
 
+    - name: View Artifacts Structure
+      run: |
+        ls first/
+        ls second/
+
     - name: Update container base with predictors and spliced
       uses: buildsi/smeagle-examples/actions/install@main
 
-#    - name: Run Unit Tests with Spliced
-#      uses: buildsi/smeagle-examples/actions/test@main
-#      with:
-#        tests_dir: ${{ github.workspace }}
-#        cache_dir: /tmp/cache
-#        results_dir: /tmp/diff-results
-#        cxx: ${{ matrix.container[1] }} 
-#        compiler: ${{ matrix.container[2] }} 
-#        skip_smeagle: ${{ github.event.inputs.skip_smeagle }}       
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Compare Matching Libs
+      run: /bin/bash run_spliced_tests.sh ${{ matrix.lib }}
+
 
 #      - name: Save result artifact
 #        uses: actions/upload-artifact@v3
