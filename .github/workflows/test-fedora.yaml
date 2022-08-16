@@ -42,7 +42,7 @@ jobs:
       - name: Move Fedora Libs
         run: |
           mkdir -p ./libs        
-          python find_libs.py /lib64 ./libs
+          python3 find_libs.py /lib64 ./libs
 
       - name: View Fedora Libs
         run: tree ./libs
@@ -59,43 +59,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        lib: ["libadwaitaqtpriv.so",
-              "libaspell.so",
-              "libboost_log.so",
-              "libclucene-core.so",
-              "libdap.so",
-              "libdcerpc-samr.so",
-              "libdjvulibre.so",
-              "dovecot/libdovecot-storage.so",
-              "libexiv2.so",
-              "libgdal.so",
-              "libgeos.so",
-              "libglibmm-2.4.so",
-              "mozilla/plugins/gmp-gmpopenh264/system-installed/libgmpopenh264.so",
-              "libhdf5_cpp.so",
-              "libicui18n.so",
-              "libicuuc.so",
-              "dyninst/libinstructionAPI.so",
-              "libjavascriptcoregtk-4.0.so",
-              "libjxl.so",
-              "libkmldom.so",
-              "libmusicbrainz5.so",
-              "libOpenEXRUtil-3_1.so",
-              "libopenh264.so",
-              "libOSMesa.so",
-              "libproj.so",
-              "libQt5WaylandClient.so",
-              "libQt5WaylandCompositor.so",
-              "libQt5XmlPatterns.so",
-              "libSDL2_image-2.0.so",
-              "libstdc++.so",
-              "libtag.so",
-              "libreoffice/program/libuno_cppuhelpergcc3.so",
-              "libvtkRenderingCore.so",
-              "libwebrtc_audio_processing.so",
-              "libicui18n.so",
-              "libicuuc.so"]
-
         # Artifact pairs (named) for comparison)
         artifacts: [["fedora-libs-34", "fedora-libs-35"],
                     ["fedora-libs-34", "fedora-libs-36"],
@@ -109,7 +72,7 @@ jobs:
       image: ghcr.io/buildsi/ubuntu:ubuntu-22.04
       options: "--platform=linux/amd64"
 
-    name: ${{ matrix.artifacts[0] }} vs ${{ matrix.artifacts[1] }} ${{ matrix.lib }}
+    name: ${{ matrix.artifacts[0] }} vs ${{ matrix.artifacts[1] }}
     steps:
     - name: Make More Room
       run: |        
@@ -140,17 +103,10 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Compare Matching Libs
-      run: /bin/bash run_spliced_tests.sh ${{ matrix.lib }}
+      run: /bin/bash test_libs.py ./first ./second
 
-
-#      - name: Save result artifact
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: ${{ matrix.container[2] }}
-#          path: /tmp/diff-results
-
-#      - name: Save Smeagle Cache
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: cache-smeagle-${{ matrix.container[2] }}
-#          path: /tmp/cache
+    - name: Save result artifact
+      uses: actions/upload-artifact@v3
+        with:
+         name: ${{ matrix.artifacts[0] }}-vs-${{ matrix.artifacts[1] }}
+         path: /tmp/results
