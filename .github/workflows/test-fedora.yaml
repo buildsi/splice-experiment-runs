@@ -39,14 +39,19 @@ jobs:
       - name: Install Fedora Libs
         run: /bin/bash fedora_installs.sh
 
+      - name: Move Fedora Libs
+        run: |
+          mkdir -p ./libs
+          cp -R /libs64 ./libs
+
       - name: View Fedora Libs
-        run: tree /lib64
+        run: tree ./libs
 
       - name: Upload Libs
         uses: actions/upload-artifact@v3
         with:
           name: fedora-libs-${{ matrix.container[1] }}
-          path: /lib64
+          path: ./libs
 
   abi:
     runs-on: ubuntu-latest
