@@ -93,10 +93,10 @@ jobs:
 
         # Artifact pairs (named) for comparison)
         artifacts: [["fedora-libs-34", "fedora-libs-35"],
-                    ["fedora-libs-34", "fedora-libs-36"]
-                    ["fedora-libs-34", "fedora-libs-37"]
-                    ["fedora-libs-35", "fedora-libs-36"]
-                    ["fedora-libs-35", "fedora-libs-37"]
+                    ["fedora-libs-34", "fedora-libs-36"],
+                    ["fedora-libs-34", "fedora-libs-37"],
+                    ["fedora-libs-35", "fedora-libs-36"],
+                    ["fedora-libs-35", "fedora-libs-37"],
                     ["fedora-libs-36", "fedora-libs-37"]]
 
     name: ${{ matrix.artifacts[0] }} vs ${{ matrix.artifacts[1] }} ${{ matrix.lib }}
