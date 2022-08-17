@@ -73,7 +73,10 @@ def main(src, dest):
         if os.path.exists(dest_lib):
             continue
         # Either we write result to new location with debug
-        dest_lib = add_debug_info(lib, dest_lib)
+        try:
+            dest_lib = add_debug_info(lib, dest_lib)
+        except:
+            continue
         if not dest_lib:
             continue
         found_debug.append(dest_lib)
