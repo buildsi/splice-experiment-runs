@@ -70,8 +70,6 @@ def run_spliced(A, B, experiment_name, outfile):
     results = experiment.to_dict()
     utils.mkdir_p(os.path.dirname(os.path.abspath(outfile)))
     utils.write_json(results, outfile)
-    print(json.dumps(results, indent=4))
-
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
