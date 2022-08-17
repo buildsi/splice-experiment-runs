@@ -71,6 +71,7 @@ def run_spliced(A, B, experiment_name, outfile):
     utils.mkdir_p(os.path.dirname(os.path.abspath(outfile)))
     utils.write_json(results, outfile)
 
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         sys.exit("Expecting a first and second directory of libs as two arguments.")

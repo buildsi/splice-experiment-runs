@@ -22,7 +22,7 @@ def add_debug_info(lib, dest_lib):
     print("Looking for debuginfo file for %s" % lib)
     cmd = ["eu-readelf", "--string-dump=.gnu_debuglink", lib]
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
+    stdout, stderr = p.communicate()
     if p.return_code != 0:
         sys.exit(f"Issue asking for debug for {lib}")
     lines = [
@@ -32,7 +32,8 @@ def add_debug_info(lib, dest_lib):
     debug_file = debug_file.split(" ")[-1]
     print("Found debug file name %s" % debug_file)
     if "debug" not in debug_file:
-        sys.exit("Cannot find debug file in %s" % debug_file)
+        print("Cannot find debug file in %s" % debug_file)
+        return
     debug_path = "/usr/lib/debug" + os.path.dirname(lib) + "/" + debug_file
     if not os.path.exists(debug_path):
         sys.exit("Debug file %s does not exist" % debug_path)
@@ -41,7 +42,8 @@ def add_debug_info(lib, dest_lib):
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
     if p.return_code != 0:
-        sys.exit(f"Issue adding debug info back {stderr}")
+        print(f"Issue adding debug info back {stderr}")
+        return
     return dest_lib
 
 
