@@ -79,6 +79,12 @@ jobs:
         rm -rf /usr/share/dotnet
         rm -rf /opt/ghc
 
+    - name: Update container base with predictors and spliced
+      uses: buildsi/smeagle-examples/actions/install@main
+
+    - name: Checkout
+      uses: actions/checkout@v3
+
     - name: Download First Version
       uses: actions/download-artifact@v2
       with:
@@ -95,13 +101,7 @@ jobs:
       run: |
         ls first/
         ls second/
-
-    - name: Update container base with predictors and spliced
-      uses: buildsi/smeagle-examples/actions/install@main
-
-    - name: Checkout
-      uses: actions/checkout@v3
-
+        
     - name: Compare Matching Libs
       run: |
         # Ensure we can see Python installs
