@@ -84,6 +84,7 @@ def main(src, dest):
         # or copy the original
         if not os.path.exists(dest_lib):
             print("Copying %s to %s" % (lib, dest_lib))
+            os.makedirs(os.path.dirname(dest_lib))
             shutil.copyfile(lib, dest_lib)
 
     print("Found %s libraries with debug" % (len(found_debug)))
