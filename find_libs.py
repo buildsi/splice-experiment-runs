@@ -6,14 +6,14 @@ import fnmatch
 import shutil
 
 
-def recursive_find(base, pattern="*.so"):
+def recursive_find(base, pattern="*.so*"):
     for root, _, filenames in os.walk(base):
         for filename in fnmatch.filter(filenames, pattern):
             yield os.path.join(root, filename)
 
 
 def main(src, dest):
-    for lib in recursive_find(src, "*.so"):
+    for lib in recursive_find(src, "*.so*"):
         lib = os.path.realpath(lib)
         lib_dir = os.path.dirname(src).replace(src, "").strip("/")
         dest_lib = os.path.join(dest, lib_dir, os.path.basename(lib))
