@@ -62,17 +62,18 @@ def main(src, dest):
 
     # Find so libs, along with debug
     for lib in recursive_find(src):
-        print(f"PARSING LIBRARY {lib}")
         if ".so" not in lib:
             continue
 
+        print(f"PARSING LIBRARY {lib}")
+        original = lib
         lib = os.path.realpath(lib)
         basename = os.path.basename(lib)
 
         # Skip hidden files
         if basename.startswith("."):
             continue
-        lib_dir = os.path.dirname(lib).replace(src, "")
+        lib_dir = os.path.dirname(original).replace(src, "")
         dest_lib = os.path.join(dest, lib_dir, os.path.basename(lib))
         dirname = os.path.dirname(dest_lib)
         if not os.path.exists(dirname):
