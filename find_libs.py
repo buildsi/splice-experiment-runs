@@ -56,6 +56,8 @@ def main(src, dest):
     if not dest.endswith("/"):
         dest = dest + "/"
 
+    print("Source: %s" % src)
+    print("Dest: %s" % dest)
     found_debug = []
 
     # Find so libs, along with debug
