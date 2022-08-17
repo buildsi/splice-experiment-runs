@@ -63,7 +63,7 @@ def main(src, dest):
         if ".so" not in lib:
             continue
 
-        lib = os.path.realpath(lib)
+        #lib = os.path.realpath(lib)
         basename = os.path.basename(lib)
 
         # Skip hidden files
