@@ -47,7 +47,8 @@ def main(first, second, os_a, os_b, outdir):
 
         experiment = "%s-%s-%s" % (prefix, os_a, os_b)
         outfile = os.path.join(outdir, "%s.json" % experiment)
-        run_spliced(lib, second_lib, experiment, outfile)
+        if not os.path.exists(outfile):
+            run_spliced(lib, second_lib, experiment, outfile)
 
 
 def run_spliced(A, B, experiment_name, outfile):
