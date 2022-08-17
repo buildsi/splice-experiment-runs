@@ -23,7 +23,7 @@ def add_debug_info(lib, dest_lib):
     cmd = ["eu-readelf", "--string-dump=.gnu_debuglink", lib]
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = p.communicate()
-    if p.return_code != 0:
+    if p.returncode != 0:
         sys.exit(f"Issue asking for debug for {lib}")
     lines = [
         x for x in stdout.decode("utf-8", errors="ignore").split("\n") if x.strip()
@@ -41,7 +41,7 @@ def add_debug_info(lib, dest_lib):
     cmd = ["eu-unstrip", lib, debug_path, "-o", dest_lib]
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
-    if p.return_code != 0:
+    if p.returncode != 0:
         print(f"Issue adding debug info back {stderr}")
         return
     return dest_lib
