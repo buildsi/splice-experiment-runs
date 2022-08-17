@@ -72,7 +72,7 @@ def main(src, dest):
         # Skip hidden files
         if basename.startswith("."):
             continue
-        lib_dir = os.path.dirname(lib).replace(src, "").strip("/")
+        lib_dir = os.path.dirname(lib).replace(src, "")
         dest_lib = os.path.join(dest, lib_dir, os.path.basename(lib))
         if os.path.exists(dest_lib):
             continue
