@@ -9,8 +9,16 @@ declare -a libs=("libadwaita-qt5" "aspell" "boost-log", "clucene-core" "libdap" 
 
 # failed could not find "libicu67" (removed)
 
+# We need to use eu-readelf to get .gnu-debuglink
+dnf install -y elfutils
+
+# install debug info plugin
+dnf install -y dnf-plugins-core
+
 dnf install -y findutils tree
 for lib in "${libs[@]}"; do
    printf "dnf install ${lib}\n"
-   dnf install -y ${lib}
+   
+   # Adds debug info to (same path) plus debug in /usr/lib/debug
+   dnf debuginfo-install -y ${lib}
 done
