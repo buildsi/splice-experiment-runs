@@ -26,7 +26,7 @@ def main(first, second, os_a, os_b, outdir):
     # Create a lookup of prefixes for second libs
     prefixes = {}
     found = list(recursive_find(second))
-    print('Found %s libs' % len(found))
+    print("Found %s libs" % len(found))
     for lib in found:
         prefixes[get_prefix(lib)] = lib
 
@@ -50,13 +50,13 @@ def main(first, second, os_a, os_b, outdir):
         run_spliced(lib, second_lib, experiment, outfile)
 
 
-def run_spliced(A, B, experiment, outfile):
+def run_spliced(A, B, experiment_name, outfile):
     """
     Run a manual experiment
     """
     # A general SpackExperiment does a replacement
     experiment = spliced.experiment.manual.ManualExperiment()
-    experiment.init(package=A, splice=B, experiment=experiment)
+    experiment.init(package=A, splice=B, experiment=experiment_name)
 
     # Perform the experiment
     experiment.run()
