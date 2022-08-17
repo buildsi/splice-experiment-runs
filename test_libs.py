@@ -66,5 +66,5 @@ if __name__ == "__main__":
     second = os.path.abspath(sys.argv[2])
     os_a = os.path.abspath(sys.argv[3])
     os_b = os.path.abspath(sys.argv[4])
-    outdir = os.path.absopath(sys.argv[5])
+    outdir = os.path.abspath(sys.argv[5])
     main(first, second, os_a, os_b, outdir)
