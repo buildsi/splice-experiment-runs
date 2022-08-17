@@ -74,9 +74,10 @@ def main(src, dest):
             continue
         # Either we write result to new location with debug
         try:
-            dest_lib = add_debug_info(lib, dest_lib)
-            if dest_lib:
-                found_debug.append(dest_lib)
+            res = add_debug_info(lib, dest_lib)
+            if res:
+                dest_lib = res
+                found_debug.append(res)
         except:
             print(f"Issue looking for info for {lib}")
 
