@@ -2,16 +2,15 @@
 
 import os
 import sys
-import fnmatch
 import shutil
 import subprocess
 
 debug_prefix = "/usr/lib/debug"
 
 
-def recursive_find(base, pattern="*.so*"):
+def recursive_find(base):
     for root, _, filenames in os.walk(base):
-        for filename in fnmatch.filter(filenames, pattern):
+        for filename in filenames:
             yield os.path.join(root, filename)
 
 
@@ -49,14 +48,25 @@ def add_debug_info(lib, dest_lib):
 
 
 def main(src, dest):
-    print(os.listdir("/usr/lib/debug/usr/lib64/"))
+
+    # Must end in trailing slash
+    if not src.endswith("/"):
+        src = src + "/"
+    if not dest.endswith("/"):
+        dest = dest + "/"
+
+    found_debug = []
+
     # Find so libs, along with debug
-    for lib in recursive_find(src, "*.so*"):
+    for lib in recursive_find(src):
+        if ".so" not in lib:
+            continue
+
         lib = os.path.realpath(lib)
         basename = os.path.basename(lib)
 
         # Skip hidden files
-        if basename.startswith('.'):
+        if basename.startswith("."):
             continue
         lib_dir = os.path.dirname(src).replace(src, "").strip("/")
         dest_lib = os.path.join(dest, lib_dir, os.path.basename(lib))
@@ -64,14 +74,19 @@ def main(src, dest):
             continue
         # Either we write result to new location with debug
         try:
-            add_debug_info(lib, dest_lib)
+            dest_lib = add_debug_info(lib, dest_lib)
+            if dest_lib:
+                found_debug.append(dest_lib)
         except:
-            print(f'Issue looking for info for {lib}')
+            print(f"Issue looking for info for {lib}")
 
         # or copy the original
         if not os.path.exists(dest_lib):
             print("Copying %s to %s" % (lib, dest_lib))
             shutil.copyfile(lib, dest_lib)
+
+    print("Found %s libraries with debug" % (len(found_debug)))
+    print(json.dumps(found_debug))
 
 
 if __name__ == "__main__":
