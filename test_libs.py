@@ -11,7 +11,7 @@ import spliced.utils as utils
 from spliced.logger import logger
 
 
-def recursive_find(base, pattern="*.so*"):
+def recursive_find(base):
     for root, _, filenames in os.walk(base):
         for filename in fnmatch.filter(filenames, pattern):
             yield os.path.join(root, filename)
@@ -74,12 +74,14 @@ if __name__ == "__main__":
         sys.exit("Expecting a first and second directory of libs as two arguments.")
     first = os.path.abspath(sys.argv[1])
     second = os.path.abspath(sys.argv[2])
-    os_a = os.path.abspath(sys.argv[3])
-    os_b = os.path.abspath(sys.argv[4])
+    os_a = sys.argv[3]
+    os_b = sys.argv[4]
     outdir = os.path.abspath(sys.argv[5])
     print(f"First directory {first}")
     print(f"Second directory {second}")
     print(f"OS A {os_a}")
     print(f"OS B {os_b}")
     print(f"Output directory {outdir}")
+    os.listdir(first)
+    os.listdir(second)
     main(first, second, os_a, os_b, outdir)
