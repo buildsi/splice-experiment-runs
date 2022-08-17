@@ -62,7 +62,7 @@ def run_spliced(A, B, experiment, outfile):
 
     # Perform the experiment
     experiment.run()
-    experiment.predict(args.predictor, skip=["spack-test"], predict_type="diff")
+    experiment.predict(None, skip=["spack-test"], predict_type="diff")
     results = experiment.to_dict()
     utils.mkdir_p(os.path.dirname(os.path.abspath(outfile)))
     utils.write_json(results, args.outfile)
