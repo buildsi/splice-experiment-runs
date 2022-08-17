@@ -116,7 +116,7 @@ jobs:
         export PATH=/usr/local/bin:${HOME}/.local/bin:/usr/bin:$PATH
         outdir="${results_dir}/fedora"
         mkdir -p ${outdir}
-        /opt/conda/bin/python test_libs.py ./first ./second ${{ matrix.artifacts[0] }} ${{ matrix.artifacts[1] }} ${outfile}
+        /opt/conda/bin/python test_libs.py ./first ./second ${{ matrix.artifacts[0] }} ${{ matrix.artifacts[1] }} ${outdir}
 
     - name: Save result artifact
       uses: actions/upload-artifact@v3
