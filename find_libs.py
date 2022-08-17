@@ -1,7 +1,6 @@
 # Find any .so libraries in a dest and move to a source.
 
 import os
-import json
 import sys
 import shutil
 import subprocess
@@ -74,26 +73,21 @@ def main(src, dest):
         if os.path.exists(dest_lib):
             continue
         # Either we write result to new location with debug
-        try:
-            dest_lib = add_debug_info(lib, dest_lib)
-            if dest_lib:
-                found_debug.append(debug_lib)
-                copyfile(lib, dest_lib)
+        dest_lib = add_debug_info(lib, dest_lib)
+        if not dest_lib:
+            continue
+        found_debug.append(dest_lib)
 
-        except:
-            print(f"Issue looking for debug info for {lib}")
+        # or copy the original
+        if not os.path.exists(dest_lib):
+            print("Copying %s to %s" % (lib, dest_lib))
+            dirname = os.path.dirname(dest_lib)
+            if not os.path.exists(dirname):
+                os.makedirs(dirname)
+            shutil.copyfile(lib, dest_lib)
 
     print("Found %s libraries with debug" % (len(found_debug)))
     print(json.dumps(found_debug))
-
-
-def copyfile(lib, dest_lib):
-    if not os.path.exists(dest_lib):
-        print("Copying %s to %s" % (lib, dest_lib))
-        dirname = os.path.dirname(dest_lib)
-        if not os.path.exists(dirname):
-            os.makedirs(dirname)
-        shutil.copyfile(lib, dest_lib)
 
 
 if __name__ == "__main__":
