@@ -13,7 +13,7 @@ from spliced.logger import logger
 
 def recursive_find(base):
     for root, _, filenames in os.walk(base):
-        for filename in fnmatch.filter(filenames, pattern):
+        for filename in filenames:
             yield os.path.join(root, filename)
 
 
