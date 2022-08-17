@@ -30,19 +30,17 @@ def main(first, second, os_a, os_b, outdir):
     for lib in found:
         prefixes[get_prefix(lib)] = lib
 
-    print(json.dumps(prefixes, indent=4))
-
     # Match first and second libs on .so
     # These should already be realpath from find_libs.py
     for lib in recursive_find(first):
         print("Looking for match to %s" % lib)
         lib = os.path.abspath(lib)
-        lib_dir = os.path.dirname(first).replace(first, "").strip("/")
+        lib_dir = os.path.dirname(lib).replace(first, "").strip("/")
         prefix = get_prefix(lib)
         print("Matching prefix %s" % prefix)
         if prefix in prefixes:
             second_lib = prefixes[prefix]
-            print("Found match %s" % second_lib)
+            print("Found match %s for %s" % (second_lib, lib))
         else:
             print("Did not find match for %s" % lib)
             continue
@@ -65,7 +63,7 @@ def run_spliced(A, B, experiment, outfile):
     experiment.predict(None, skip=["spack-test"], predict_type="diff")
     results = experiment.to_dict()
     utils.mkdir_p(os.path.dirname(os.path.abspath(outfile)))
-    utils.write_json(results, args.outfile)
+    utils.write_json(results, outfile)
     print(json.dumps(results, indent=4))
 
 
