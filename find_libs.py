@@ -34,14 +34,14 @@ def add_debug_info(lib, dest_lib):
     if "debug" not in debug_file:
         print("Cannot find debug file in %s" % debug_file)
         return
-    debug_path = "/usr/lib/debug/" + os.path.dirname(lib) + "/" + debug_file
+    debug_path = "/usr/lib/debug" + os.path.dirname(lib) + "/" + debug_file
     if not os.path.exists(debug_path):
         print("Debug file %s does not exist" % debug_path)
         return
     # Add debug info back
     cmd = ["eu-unstrip", lib, debug_path, "-o", dest_lib]
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
+    stdout, stderr = p.communicate()
     if p.returncode != 0:
         print(f"Issue adding debug info back {stderr}")
         return
@@ -49,6 +49,7 @@ def add_debug_info(lib, dest_lib):
 
 
 def main(src, dest):
+    print(os.listdir("/usr/lib/debug/usr/lib64/"))
     # Find so libs, along with debug
     for lib in recursive_find(src, "*.so*"):
         lib = os.path.realpath(lib)
