@@ -30,7 +30,7 @@ def add_debug_info(lib, dest_lib):
     ]
     debug_file = lines[1]
     debug_file = debug_file.split(" ")[-1]
-    print("Found debug file name %s" % debug_file)
+    print("Looking for name %s" % debug_file)
     if "debug" not in debug_file:
         print("Cannot find debug file in %s" % debug_file)
         return
@@ -63,7 +63,10 @@ def main(src, dest):
         if os.path.exists(dest_lib):
             continue
         # Either we write result to new location with debug
-        add_debug_info(lib, dest_lib)
+        try:
+            add_debug_info(lib, dest_lib)
+        except:
+            print(f'Issue looking for info for {lib}')
 
         # or copy the original
         if not os.path.exists(dest_lib):
