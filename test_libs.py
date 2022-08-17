@@ -25,15 +25,20 @@ def main(first, second, os_a, os_b, outdir):
 
     # Create a lookup of prefixes for second libs
     prefixes = {}
-    found = list(recursive_find(second))
+    found = [x for x in list(recursive_find(second)) if "debug" not in x]
     print("Found %s libs" % len(found))
     for lib in found:
         prefixes[get_prefix(lib)] = lib
 
+    # Count in advance
+    libs = list(recursive_find(first))
+
     # Match first and second libs on .so
     # These should already be realpath from find_libs.py
-    for lib in recursive_find(first):
-        print("Looking for match to %s" % lib)
+    for i, lib in enumerate(libs):
+        if "debug" in lib:
+            continue
+        print("Looking for match to %s: %s of %s" % (lib, i, len(libs)))
         lib = os.path.abspath(lib)
         lib_dir = os.path.dirname(lib).replace(first, "").strip("/")
         prefix = get_prefix(lib)

@@ -13,14 +13,22 @@ def recursive_find(base, pattern="*.so*"):
 
 
 def main(src, dest):
+    # Copy so libs
     for lib in recursive_find(src, "*.so*"):
-        lib = os.path.realpath(lib)
-        lib_dir = os.path.dirname(src).replace(src, "").strip("/")
-        dest_lib = os.path.join(dest, lib_dir, os.path.basename(lib))
-        if os.path.exists(dest_lib):
-            continue
-        print("Copying %s to %s" % (lib, dest_lib))
-        shutil.copyfile(lib, dest_lib)
+        copyfile(lib, dest)
+    # And debug
+    for lib in recursive_find(src, "*.debug*"):
+        copyfile(lib, dest)
+
+
+def copyfile(lib, dest):
+    lib = os.path.realpath(lib)
+    lib_dir = os.path.dirname(src).replace(src, "").strip("/")
+    dest_lib = os.path.join(dest, lib_dir, os.path.basename(lib))
+    if os.path.exists(dest_lib):
+        return
+    print("Copying %s to %s" % (lib, dest_lib))
+    shutil.copyfile(lib, dest_lib)
 
 
 if __name__ == "__main__":
