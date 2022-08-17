@@ -19,7 +19,7 @@ dnf install -y dnf-plugins-core
 
 dnf install -y findutils tree
 for lib in "${libs[@]}"; do
-   printf "dnf install ${lib}\n"
+   printf "dnf debuginfo-install -y ${lib}\n"
    
    # Adds debug info to (same path) plus debug in /usr/lib/debug
    dnf debuginfo-install -y ${lib}
