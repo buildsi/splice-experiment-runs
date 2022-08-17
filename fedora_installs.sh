@@ -23,4 +23,5 @@ for lib in "${libs[@]}"; do
    
    # Adds debug info to (same path) plus debug in /usr/lib/debug
    dnf debuginfo-install -y ${lib}
+   dnf install -y ${lib}
 done
