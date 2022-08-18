@@ -39,13 +39,17 @@ jobs:
       - name: Install Fedora Libs
         run: /bin/bash fedora_installs.sh
 
-      - name: Find .dwz
-        run: find / -name .dwz
-
       - name: Move Fedora Libs
         run: |
           mkdir -p ./libs        
           python3 find_libs.py /lib64 ./libs
+
+      - name: Find .dwz
+        run: |
+          find / -name .dwz
+          cp -R /usr/lib/debug/.dwz ./libs/.dwz
+          mkdir -p /libs/usr/
+          cp -R /usr/lib/debug/usr/.dwz ./libs/usr/.dwz
 
       - name: View Fedora Libs
         run: tree ./libs
