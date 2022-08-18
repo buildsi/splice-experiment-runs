@@ -99,7 +99,7 @@ def main(src, dest):
     # Copy dwz
     dwz = os.path.join(dest, '.dwz')
     os.makedirs(dwz)
-    for path in ["/usr/lib/debug/usr/.dwz", ["./usr/lib/debug/.dwz"]:
+    for path in ["/usr/lib/debug/usr/.dwz", "/usr/lib/debug/.dwz"]:
         if os.path.exists(path):        
             for filename in recursive_find(path):
                 basename = os.path.basename(filename)
