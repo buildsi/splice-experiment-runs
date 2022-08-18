@@ -39,6 +39,9 @@ jobs:
       - name: Install Fedora Libs
         run: /bin/bash fedora_installs.sh
 
+      - name: Find .dwz
+        run: find / -name .dwz
+
       - name: Move Fedora Libs
         run: |
           mkdir -p ./libs        
