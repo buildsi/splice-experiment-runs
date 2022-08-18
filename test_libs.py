@@ -36,7 +36,8 @@ def main(first, second, os_a, os_b, outdir):
     # Match first and second libs on .so
     # These should already be realpath from find_libs.py
     for i, lib in enumerate(libs):
-        if "debug" in lib:
+        # Skip debug files
+        if "debug" in lib or "dwz" in lib:
             continue
         print("Looking for match to %s: %s of %s" % (lib, i, len(libs)))
         lib = os.path.abspath(lib)
