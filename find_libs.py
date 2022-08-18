@@ -14,7 +14,6 @@ def recursive_find(base):
         for filename in filenames:
             yield os.path.join(root, filename)
 
-
 def add_debug_info(lib, dest_lib):
     """
     Get lookup of debug file prefixes.
@@ -96,6 +95,18 @@ def main(src, dest):
             shutil.copyfile(lib, dest_lib)
 
     print("Found %s libraries with debug" % (len(found_debug)))
+
+    # Copy dwz
+    dwz = os.path.join(dest, '.dwz')
+    os.makedirs(dwz)
+    for path in ["/usr/lib/debug/usr/.dwz", ["./usr/lib/debug/.dwz"]:
+        if os.path.exists(path):        
+            for filename in recursive_find(path):
+                basename = os.path.basename(filename)
+                dest_path = os.path.join(dwz, basename)
+                if not os.path.exists(dest_path):
+                    shutil.copyfile(filename, dest_path)            
+    os.listdir(dwz)
     print(json.dumps(found_debug))
 
 
