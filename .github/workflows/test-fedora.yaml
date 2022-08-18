@@ -47,9 +47,9 @@ jobs:
       - name: Find .dwz
         run: |
           find / -name .dwz
-          mv /usr/lib/debug/.dwz ./libs/.dwz
+          mv /usr/lib/debug/.dwz ./libs/dwz
           mkdir -p ./libs/usr/
-          mv /usr/lib/debug/usr/.dwz ./libs/usr/.dwz
+          mv /usr/lib/debug/usr/.dwz ./libs/usr/dwz
 
       - name: View Fedora Libs
         run: tree ./libs
