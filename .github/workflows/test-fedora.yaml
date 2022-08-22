@@ -37,12 +37,9 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install Fedora Libs
-        run: /bin/bash fedora_installs.sh
-
-      - name: Move Fedora Libs
         run: |
-          mkdir -p ./libs        
-          python3 find_libs.py /lib64 ./libs
+          mkdir -p ./libs
+          /bin/bash fedora_installs.sh ./libs
 
       - name: Find .dwz
         run: |
