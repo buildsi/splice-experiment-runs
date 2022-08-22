@@ -118,6 +118,10 @@ jobs:
         export PATH=/usr/local/bin:${HOME}/.local/bin:/usr/bin:$PATH
         outdir="${results_dir}/fedora"
         mkdir -p ${outdir}
+        export LIBABIGAIL_DEBUGINFO_DIR1=first/debug
+        export LIBABIGAIL_DEBUGINFO_DIR2=second/debug
+        export ABILAB_DEBUGINFO_DIR1=first/debug
+        export ABILAB_DEBUGINFO_DIR2=second/debug
         printf "/opt/conda/bin/python test_libs.py ./first ./second ${{ matrix.artifacts[0] }} ${{ matrix.artifacts[1] }} ${outdir}\n"
         /opt/conda/bin/python test_libs.py ./first ./second ${{ matrix.artifacts[0] }} ${{ matrix.artifacts[1] }} ${outdir}
 
