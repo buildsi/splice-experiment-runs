@@ -51,7 +51,7 @@ jobs:
           find / -name .dwz
           mv /usr/lib/debug/.dwz ./libs/dwz
           mkdir -p ./libs/usr/
-          mv /usr/lib/debug/usr/.dwz ./libs/usr/dwz
+          cp -R /usr/lib/debug/usr/.dwz ./libs/usr/dwz
           mkdir -p ./libs/debug
           cp -R /usr/lib/debug/usr /usr/lib/debug/.dwz ./libs/debug
 
