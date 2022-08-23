@@ -41,8 +41,17 @@ jobs:
           mkdir -p ./libs
           /bin/bash fedora_installs.sh ./libs
 
+      - name: Move Fedora Libs
+        run: |
+          mkdir -p ./libs
+          python3 find_libs.py /lib64 ./libs
+
       - name: Copy debuginfo files
         run: |
+          find / -name .dwz
+          mv /usr/lib/debug/.dwz ./libs/dwz
+          mkdir -p ./libs/usr/
+          mv /usr/lib/debug/usr/.dwz ./libs/usr/dwz
           mkdir -p ./libs/debug
           cp -R /usr/lib/debug/usr /usr/lib/debug/.dwz ./libs/debug
 
@@ -103,6 +112,18 @@ jobs:
       run: |
         ls first/
         ls second/
+        mkdir -p ../.dwz
+        mkdir -p ../../.dwz
+        mkdir -p ../usr/.dwz
+        mkdir -p ../../usr/.dwz
+        cp -R first/dwz/* ../.dwz/
+        cp -R first/dwz/* ../../.dwz/
+        cp -R first/dwz/* ../usr/.dwz/
+        cp -R first/dwz/* ../../usr/.dwz/
+        cp -R second/dwz/* ../.dwz/
+        cp -R second/dwz/* ../../.dwz/
+        cp -R second/dwz/* ../usr/.dwz/
+        cp -R second/dwz/* ../../usr/.dwz/
 
     - name: Compare Matching Libs
       run: |
