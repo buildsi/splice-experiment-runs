@@ -50,8 +50,9 @@ jobs:
       - name: Copy debuginfo files
         run: |
           mkdir -p ./libs/debug
-          cp -R /usr/lib/debug/usr /usr/lib/debug/.dwz ./libs/debug
-          
+          ln -fs /usr/lib/debug/usr -t libs/debug
+          ln -fs /usr/lib/debug/.dwz -t libs/debug
+
       - name: Copy library files
         run: |
           cp -RLu --parents /lib libs
