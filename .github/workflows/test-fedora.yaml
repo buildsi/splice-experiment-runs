@@ -35,16 +35,27 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v3
+      
+      - name: Install system debuginfo files
+        run: |
+          dnf install -y dnf-plugins-core
+          packages=$(find /lib64/ /lib/ -type f -name "*.so.*" | xargs rpm -qf | sort -u)
+          for p in ${packages[*]}; do dnf debuginfo-install -y $p; done
 
       - name: Install Fedora Libs
         run: |
           mkdir -p ./libs
-          /bin/bash fedora_installs.sh ./libs
+          /bin/bash fedora_installs.sh
 
       - name: Copy debuginfo files
         run: |
           mkdir -p ./libs/debug
           cp -R /usr/lib/debug/usr /usr/lib/debug/.dwz ./libs/debug
+          
+      - name: Copy library files
+        run: |
+          cp -RLu --parents /lib libs
+          cp -RLu --parents /lib64 libs
 
       - name: View Fedora Libs
         run: tree ./libs
