@@ -55,8 +55,9 @@ jobs:
 
       - name: Copy library files
         run: |
-          cp -RLu --parents /lib libs
-          cp -RLu --parents /lib64 libs
+          # Copy files from /lib and /lib64 with names containing the
+          # string '.so' that are not symlinks and do not live in /lib/debug
+          find /lib/ /lib64/ -type f -iname "*.so*" ! -type l -not -path "/lib/debug/*" -exec cp -u --parents {} libs/ \;
 
       - name: View Fedora Libs
         run: tree ./libs
