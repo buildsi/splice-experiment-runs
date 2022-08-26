@@ -36,6 +36,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Installation setup
+        run: |
+          mkdir -p ./libs/usr/lib/debug
+          dnf install -y dnf-plugins-core
+
       - name: Install Fedora Libs
         run: |
           mkdir -p ./libs
@@ -48,7 +53,6 @@ jobs:
 
       - name: Copy debuginfo files
         run: |
-          mkdir -p ./libs/debug
           ln -fs /usr/lib/debug/usr -t libs/debug
           ln -fs /usr/lib/debug/.dwz -t libs/debug
 
