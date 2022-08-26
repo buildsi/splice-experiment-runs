@@ -56,6 +56,11 @@ def main(first, second, os_a, os_b, outdir):
         if not os.path.exists(outfile):
             run_spliced(lib, second_lib, experiment, outfile)
 
+        # Try cleaning up the libs after to make more space
+        for libname in [lib, second_lib]:
+            if os.path.exists(libname):
+                os.remove(libname)
+
 
 def run_spliced(A, B, experiment_name, outfile):
     """
