@@ -53,14 +53,14 @@ jobs:
 
       - name: Copy debuginfo files
         run: |
-          ln -fs /usr/lib/debug/usr -t libs/debug
-          ln -fs /usr/lib/debug/.dwz -t libs/debug
+          ln -fs /usr/lib/debug/usr -t libs/usr/lib/debug
+          ln -fs /usr/lib/debug/.dwz -t libs/usr/lib/debug
 
       - name: Copy library files
         run: |
-          # Copy files from /lib and /lib64 with names containing the
-          # string '.so' that are not symlinks and do not live in /lib/debug
-          find /lib/ /lib64/ -type f -iname "*.so*" ! -type l -not -path "/lib/debug/*" -exec cp -u --parents {} libs/ \;
+          # Copy files from /usr/lib and /usr/lib64 with names containing the
+          # string '.so' that are not symlinks and do not live in /usr/lib/debug
+          find /usr/lib/ /usr/lib64/ -type f -iname "*.so*" ! -type l -not -path "/usr/lib/debug/*" -exec cp -u --parents {} libs/ \;
 
       - name: View Fedora Libs
         run: tree ./libs
@@ -114,6 +114,14 @@ jobs:
       with:
         name: ${{ matrix.artifacts[1] }}
         path: second/
+
+    - name: Reconstruct debug directories
+      run: |
+        cd first/usr/lib/debug
+        for d in bin lib lib64 sbin; do ln -sf usr/$d $d; done
+        cd -
+        cd second/usr/lib/debug
+        for d in bin lib lib64 sbin; do ln -sf usr/$d $d; done
 
     - name: View Artifacts Structure
       run: |
