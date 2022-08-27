@@ -87,7 +87,7 @@ def run_spliced(A, B, experiment_name, outfile):
 
 def get_parser():
     parser = argparse.ArgumentParser(
-        description="Spack Updater",
+        description="Fedora Test Runner",
         formatter_class=argparse.RawTextHelpFormatter,
     )
     parser.add_argument("first", help="first library directory to parse (positional)")

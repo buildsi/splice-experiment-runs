@@ -118,10 +118,10 @@ jobs:
         start: ${{ inputs.start }}
         stop: ${{ inputs.stop }}
       run: |      
-        if [ "${start}" == "" ]; then
+        if [[ "${start}" == "" ]]; then
             start=0
         fi 
-        if [ "${stop}" == "" ]; then
+        if [[ "${stop}" == "" ]]; then
             stop=5000
         fi 
         echo "start=${start}" >> ${GITHUB_ENV}
@@ -158,7 +158,7 @@ jobs:
         ls first/
         ls second/
 
-    - name: Compare Matching Libs        
+    - name: Compare Matching Libs
       run: |
         # Ensure we can see Python installs
         export PATH=/opt/conda/bin:$HOME/.local/bin:$PATH
