@@ -152,6 +152,7 @@ jobs:
         export LIBABIGAIL_DEBUGINFO_DIR2=$PWD/second/usr/lib/debug
         export ABILAB_DEBUGINFO_DIR1=$PWD/first/usr/lib/debug
         export ABILAB_DEBUGINFO_DIR2=$PWD/second/usr/lib/debug
+        export ABILAB_DISABLE_REPORTS=true
         printf "/opt/conda/bin/python test_libs.py ./first ./second ${{ matrix.artifacts[0] }} ${{ matrix.artifacts[1] }} ${outdir}\n"
         /opt/conda/bin/python test_libs.py ./first ./second ${{ matrix.artifacts[0] }} ${{ matrix.artifacts[1] }} ${outdir}
 
