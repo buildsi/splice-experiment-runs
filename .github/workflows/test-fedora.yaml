@@ -2,6 +2,16 @@ name: ABI Fedora Diffs
 on:
   pull_request: []
   workflow_dispatch: 
+    inputs:
+      start:
+        description: 'Start index for doing analysis'
+        required: true
+        default: 0
+      stop:
+        description: 'End index for doing analysis'
+        required: true
+        default: 5000
+
 
 jobs:
   build:
@@ -44,8 +54,7 @@ jobs:
       - name: Install Fedora Libs
         run: |
           mkdir -p ./libs
-          # Disabled to test if can complete in time just with default system libs
-          #/bin/bash fedora_installs.sh
+          /bin/bash fedora_installs.sh
 
       - name: Install complete debuginfo files
         run: |
@@ -104,6 +113,20 @@ jobs:
         rm -rf /usr/share/dotnet
         rm -rf /opt/ghc
 
+    - name: Set inputs for start/stop indices
+      env:
+        start: ${{ inputs.start }}
+        stop: ${{ inputs.stop }}
+      run: |      
+        if [ "${start}" == "" ]; then
+            start=0
+        fi 
+        if [ "${stop}" == "" ]; then
+            stop=5000
+        fi 
+        echo "start=${start}" >> ${GITHUB_ENV}
+        echo "stop=${stop}" >> ${GITHUB_ENV}
+
     - name: Update container base with predictors and spliced
       uses: buildsi/smeagle-examples/actions/install@main
 
@@ -135,7 +158,7 @@ jobs:
         ls first/
         ls second/
 
-    - name: Compare Matching Libs
+    - name: Compare Matching Libs        
       run: |
         # Ensure we can see Python installs
         export PATH=/opt/conda/bin:$HOME/.local/bin:$PATH
@@ -153,9 +176,9 @@ jobs:
         export LIBABIGAIL_DEBUGINFO_DIR2=$PWD/second/usr/lib/debug
         export ABILAB_DEBUGINFO_DIR1=$PWD/first/usr/lib/debug
         export ABILAB_DEBUGINFO_DIR2=$PWD/second/usr/lib/debug
-        export ABILAB_DISABLE_REPORTS=true
-        printf "/opt/conda/bin/python test_libs.py ./first ./second ${{ matrix.artifacts[0] }} ${{ matrix.artifacts[1] }} ${outdir}\n"
-        /opt/conda/bin/python test_libs.py ./first ./second ${{ matrix.artifacts[0] }} ${{ matrix.artifacts[1] }} ${outdir}
+        #export ABILAB_DISABLE_REPORTS=true
+        printf "/opt/conda/bin/python test_libs.py ./first ./second --os_a ${{ matrix.artifacts[0] }} --os_b ${{ matrix.artifacts[1] }} --outdir ${outdir} --start ${{ env.start }} --stop ${{ env.stop }}\n"
+        /opt/conda/bin/python test_libs.py ./first ./second --os_a ${{ matrix.artifacts[0] }} --os_b ${{ matrix.artifacts[1] }} --outdir ${outdir} --start ${{ env.start }} --stop ${{ env.stop }}
 
     - name: Save result artifact
       uses: actions/upload-artifact@v3
