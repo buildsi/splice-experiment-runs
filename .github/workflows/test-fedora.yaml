@@ -79,7 +79,7 @@ jobs:
           done
 
       - name: View Fedora Libs
-        run: ls ./libs
+        run: tree ./libs
 
       - name: Upload Libs
         uses: actions/upload-artifact@v3
