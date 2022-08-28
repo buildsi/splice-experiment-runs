@@ -54,7 +54,7 @@ jobs:
       - name: Install Fedora Libs
         run: |
           mkdir -p ./libs
-          /bin/bash fedora_installs.sh
+          #/bin/bash fedora_installs.sh
 
       - name: Install complete debuginfo files
         run: |
