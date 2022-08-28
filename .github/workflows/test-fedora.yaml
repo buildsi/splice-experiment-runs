@@ -60,7 +60,7 @@ jobs:
       - name: Install complete debuginfo files
         run: |
           packages=$(find /usr/lib64 /usr/lib -type f -name "*.so*" | xargs rpm -qf | sort -u)
-          for p in ${packages[*]}; do dnf debuginfo-install -y $p; done
+          for p in ${packages[*]}; do dnf debuginfo-install -y $p || echo "Skipping $p"; done
 
       - name: Copy debuginfo files
         run: |
