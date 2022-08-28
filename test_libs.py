@@ -36,13 +36,19 @@ def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
         prefixes[get_prefix(lib)] = lib
 
     # Count in advance and sort so order is meaningful
-    libs = sorted(list(recursive_find(first)))
+    libs = list(recursive_find(first))
+    libs.sort()
+    print("Found %s sorted libs" % len(libs))
+    print("Start %s" % start)
+    print("Stop %s" % stop)
 
     # Match first and second libs on .so
     # These should already be realpath from find_libs.py
     for i, lib in enumerate(libs):
+        print("%s of %s" % (i, len(libs)))
         # Only check within our range specified
         if i < start or i > stop:
+            print("Skipping %s" % lib)
             continue
         if "debug" in lib or "dwz" in lib:
             continue
