@@ -168,7 +168,7 @@ jobs:
         export ABILAB_DEBUGINFO_DIR2=$PWD/second/usr/lib/debug
         #export ABILAB_DISABLE_REPORTS=true
         printf "/opt/conda/bin/python test_libs.py ./first ./second --os_a ${{ matrix.artifacts[0] }} --os_b ${{ matrix.artifacts[1] }} --outdir ${outdir} --start ${{ env.start }} --stop ${{ env.stop }}\n"
-        /opt/conda/bin/python test_libs.py ./first ./second --os_a ${{ matrix.artifacts[0] }} --os_b ${{ matrix.artifacts[1] }} --outdir ${outdir} --start ${{ env.stop }} --stop ${{ env.stop }}
+        /opt/conda/bin/python test_libs.py ./first ./second --os_a ${{ matrix.artifacts[0] }} --os_b ${{ matrix.artifacts[1] }} --outdir ${outdir} --start ${{ env.start }} --stop ${{ env.stop }}
 
     - name: Save result artifact
       uses: actions/upload-artifact@v3
