@@ -113,8 +113,8 @@ def main():
     print("       os_a: %s" % args.os_a)
     print("       os_b: %s" % args.os_b)
     print("     outdir: %s" % args.outdir)
-    print("      start: %s" % args.first)
-    print("       stop: %s" % args.second)
+    print("      start: %s" % args.start)
+    print("       stop: %s" % args.stop)
 
     if not args.first or not args.second:
         sys.exit(
@@ -137,11 +137,11 @@ def main():
     run_analysis(
         first=first,
         second=second,
-        os_a=os_a,
-        os_b=os_b,
-        outdir=outdir,
-        start=int(start),
-        stop=int(stop),
+        os_a=args.os_a,
+        os_b=args.os_b,
+        outdir=args.outdir,
+        start=int(args.start),
+        stop=int(args.stop),
     )
 
 
