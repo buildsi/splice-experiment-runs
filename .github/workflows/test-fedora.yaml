@@ -142,13 +142,14 @@ jobs:
 
     - name: View Artifacts Structure
       run: |
-        ls first/
-        ls second/
+        apt-get update && apt-get install -y tree        
+        tree first/
+        tree second/
 
     - name: Compare Matching Libs
       env:
         start: ${{ inputs.start != '' || 0 }}
-        stop: ${{ inputs.stop != '' || 5000 }}
+        stop: ${{ inputs.stop != '' || 1000 }}
       run: |
         # Ensure we can see Python installs
         export PATH=/opt/conda/bin:$HOME/.local/bin:$PATH
