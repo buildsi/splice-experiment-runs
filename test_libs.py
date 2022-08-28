@@ -41,19 +41,22 @@ def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
     print("Found %s sorted libs" % len(libs))
     print("Start %s" % start)
     print("Stop %s" % stop)
-    print(libs)
+
+    # Count libs separately
+    count = 0
 
     # Match first and second libs on .so
     # These should already be realpath from find_libs.py
     for i, lib in enumerate(libs):
         print("Contender %s %s of %s" % (lib, i, len(libs)))
         # Only check within our range specified
-        if i < start or i > stop:
+        if count < start or count > stop:
             print("Skipping %s" % lib)
             continue
         if "debug" in lib or "dwz" in lib:
             print("Skipping %s, has debug or dwz" % lib)
             continue
+        count += 1
         print("Looking for match to %s: %s of %s" % (lib, i, len(libs)))
         lib = os.path.abspath(lib)
         lib_dir = os.path.dirname(lib).replace(first, "").strip("/")
@@ -70,11 +73,6 @@ def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
         outfile = os.path.join(outdir, "%s.json" % experiment)
         if not os.path.exists(outfile):
             run_spliced(lib, second_lib, experiment, outfile)
-
-        # Try cleaning up the libs after to make more space
-        # for libname in [lib, second_lib]:
-        #    if os.path.exists(libname):
-        #        os.remove(libname)
 
 
 def run_spliced(A, B, experiment_name, outfile):
