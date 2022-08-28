@@ -41,16 +41,18 @@ def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
     print("Found %s sorted libs" % len(libs))
     print("Start %s" % start)
     print("Stop %s" % stop)
+    print(libs)
 
     # Match first and second libs on .so
     # These should already be realpath from find_libs.py
     for i, lib in enumerate(libs):
-        print("%s of %s" % (i, len(libs)))
+        print("Contender %s %s of %s" % (lib, i, len(libs)))
         # Only check within our range specified
         if i < start or i > stop:
             print("Skipping %s" % lib)
             continue
         if "debug" in lib or "dwz" in lib:
+            print("Skipping %s, has debug or dwz" % lib)
             continue
         print("Looking for match to %s: %s of %s" % (lib, i, len(libs)))
         lib = os.path.abspath(lib)
