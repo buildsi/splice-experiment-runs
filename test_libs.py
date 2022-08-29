@@ -30,7 +30,7 @@ def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
     """
     # Create a lookup of prefixes for second libs
     prefixes = {}
-    found = [x for x in list(recursive_find(second)) if "debug" not in x]
+    found = [x for x in list(recursive_find(second)) if "debug" not in x and "dwz" not in x]
     print("Found %s libs" % len(found))
     for lib in found:
         prefixes[get_prefix(lib)] = lib
