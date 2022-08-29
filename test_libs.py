@@ -57,7 +57,9 @@ def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
             print("Skipping %s, has debug or dwz" % lib)
             continue
         count += 1
-        print("Looking for match to %s: %s of %s" % (lib, i, len(libs)))
+        print(
+            "Looking for match to %s: %s of %s, count %s" % (lib, i, len(libs), count)
+        )
         lib = os.path.abspath(lib)
         lib_dir = os.path.dirname(lib).replace(first, "").strip("/")
         prefix = get_prefix(lib)
