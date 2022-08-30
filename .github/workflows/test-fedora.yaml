@@ -10,8 +10,7 @@ on:
       stop:
         description: 'End index for doing analysis'
         required: true
-        default: 5000
-
+        default: 300
 
 jobs:
   build:
