@@ -1,5 +1,6 @@
 # Find any .so libraries in a dest and move to a source.
 
+import argparse
 import os
 import sys
 import fnmatch
@@ -21,25 +22,44 @@ def get_prefix(lib):
     return os.path.basename(lib).split(".", 1)[0]
 
 
-def main(first, second, os_a, os_b, outdir):
-
+def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
+    """
+    Main function to run the analysis between a first and second output
+    directory. We have added start/stop indices for libraries because
+    we cannot run them all in under 6 hours.
+    """
     # Create a lookup of prefixes for second libs
     prefixes = {}
-    found = [x for x in list(recursive_find(second)) if "debug" not in x]
+    found = [x for x in list(recursive_find(second)) if "debug" not in x and "dwz" not in x]
     print("Found %s libs" % len(found))
     for lib in found:
         prefixes[get_prefix(lib)] = lib
 
-    # Count in advance
+    # Count in advance and sort so order is meaningful
     libs = list(recursive_find(first))
+    libs.sort()
+    print("Found %s sorted libs" % len(libs))
+    print("Start %s" % start)
+    print("Stop %s" % stop)
+
+    # Count libs separately
+    count = 0
 
     # Match first and second libs on .so
     # These should already be realpath from find_libs.py
     for i, lib in enumerate(libs):
-        # Skip debug files
-        if "debug" in lib or "dwz" in lib:
+        print("Contender %s %s of %s" % (lib, i, len(libs)))
+        # Only check within our range specified
+        if count < start or count > stop:
+            print("Skipping %s" % lib)
             continue
-        print("Looking for match to %s: %s of %s" % (lib, i, len(libs)))
+        if "debug" in lib or "dwz" in lib:
+            print("Skipping %s, has debug or dwz" % lib)
+            continue
+        count += 1
+        print(
+            "Looking for match to %s: %s of %s, count %s" % (lib, i, len(libs), count)
+        )
         lib = os.path.abspath(lib)
         lib_dir = os.path.dirname(lib).replace(first, "").strip("/")
         prefix = get_prefix(lib)
@@ -73,19 +93,65 @@ def run_spliced(A, B, experiment_name, outfile):
     utils.write_json(results, outfile)
 
 
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        sys.exit("Expecting a first and second directory of libs as two arguments.")
-    first = os.path.abspath(sys.argv[1])
-    second = os.path.abspath(sys.argv[2])
-    os_a = sys.argv[3]
-    os_b = sys.argv[4]
+def get_parser():
+    parser = argparse.ArgumentParser(
+        description="Fedora Test Runner",
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
+    parser.add_argument("first", help="first library directory to parse (positional)")
+    parser.add_argument("second", help="second library directory to parse (positional)")
+    parser.add_argument("--os_a", help="operating system tag for first")
+    parser.add_argument("--os_b", help="operating system tag for second")
+    parser.add_argument("--outdir", help="output directory")
+    parser.add_argument("--start", help="start index in sorted libraries", default=0)
+    parser.add_argument(
+        "--stop", help="stopping index in sorted libraries", default=5000
+    )
+
+    return parser
+
+
+def main():
+    parser = get_parser()
+    args, extra = parser.parse_known_args()
+
+    # Show args to the user
+    print("      first: %s" % args.first)
+    print("     second: %s" % args.second)
+    print("       os_a: %s" % args.os_a)
+    print("       os_b: %s" % args.os_b)
+    print("     outdir: %s" % args.outdir)
+    print("      start: %s" % args.start)
+    print("       stop: %s" % args.stop)
+
+    if not args.first or not args.second:
+        sys.exit(
+            "A first and second directory of libs are required as positional arguments."
+        )
+
+    if not args.outdir:
+        sys.exit("An output directory --outdir is required.")
+
+    if not args.start:
+        args.start = 0
+    if not args.stop:
+        args.stop = 5000
+
+    first = os.path.abspath(args.first)
+    second = os.path.abspath(args.second)
     outdir = os.path.abspath(sys.argv[5])
-    print(f"First directory {first}")
-    print(f"Second directory {second}")
-    print(f"OS A {os_a}")
-    print(f"OS B {os_b}")
-    print(f"Output directory {outdir}")
     os.listdir(first)
     os.listdir(second)
-    main(first, second, os_a, os_b, outdir)
+    run_analysis(
+        first=first,
+        second=second,
+        os_a=args.os_a,
+        os_b=args.os_b,
+        outdir=args.outdir,
+        start=int(args.start),
+        stop=int(args.stop),
+    )
+
+
+if __name__ == "__main__":
+    main()

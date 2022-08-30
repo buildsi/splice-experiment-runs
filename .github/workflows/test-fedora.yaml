@@ -2,6 +2,16 @@ name: ABI Fedora Diffs
 on:
   pull_request: []
   workflow_dispatch: 
+    inputs:
+      start:
+        description: 'Start index for doing analysis'
+        required: true
+        default: 0
+      stop:
+        description: 'End index for doing analysis'
+        required: true
+        default: 5000
+
 
 jobs:
   build:
@@ -36,20 +46,38 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Installation setup
+        run: |
+          mkdir -p ./libs/usr/lib/debug
+          dnf install -y dnf-plugins-core
+
       - name: Install Fedora Libs
-        run: /bin/bash fedora_installs.sh
-
-      - name: Move Fedora Libs
         run: |
-          mkdir -p ./libs        
-          python3 find_libs.py /lib64 ./libs
+          mkdir -p ./libs
+          dnf install -y findutils tree
+          /bin/bash fedora_installs.sh
 
-      - name: Find .dwz
+      - name: Install complete debuginfo files
         run: |
-          find / -name .dwz
-          mv /usr/lib/debug/.dwz ./libs/dwz
-          mkdir -p ./libs/usr/
-          mv /usr/lib/debug/usr/.dwz ./libs/usr/dwz
+          packages=$(find /usr/lib64 /usr/lib -type f -name "*.so*" | xargs rpm -qf | sort -u)
+          for p in ${packages[*]}; do dnf debuginfo-install -y $p || echo "Skipping $p"; done
+
+      - name: Copy debuginfo files
+        run: |
+          ln -fs /usr/lib/debug/usr -t libs/usr/lib/debug
+          ln -fs /usr/lib/debug/.dwz -t libs/usr/lib/debug
+
+      - name: Copy library files
+        run: |
+          # Copy files from /usr/lib and /usr/lib64 with names containing the
+          # string '.so' that are not symlinks and do not live in /usr/lib/debug
+          find /usr/lib/ /usr/lib64/ -type f -iname "*.so*" ! -type l -not -path "/usr/lib/debug/*" -exec cp -u --parents {} libs/ \;
+          
+      - name: Remove unwanted lib files
+        run: |
+          for s in py pyc sob soc socket sod soe sog soh sop; do
+            find libs/ -name "*.$s" -delete
+          done
 
       - name: View Fedora Libs
         run: tree ./libs
@@ -104,26 +132,24 @@ jobs:
         name: ${{ matrix.artifacts[1] }}
         path: second/
 
+    - name: Reconstruct debug directories
+      run: |
+        cd first/usr/lib/debug
+        for d in bin lib lib64 sbin; do ln -sf usr/$d $d; done
+        cd -
+        cd second/usr/lib/debug
+        for d in bin lib lib64 sbin; do ln -sf usr/$d $d; done
+
     - name: View Artifacts Structure
       run: |
-        ls first/
-        ls second/
-        mkdir -p ../.dwz
-        mkdir -p ../../.dwz
-        mkdir -p ../usr/.dwz
-        mkdir -p ../../usr/.dwz
-
-        cp -R first/dwz/* ../.dwz/
-        cp -R first/dwz/* ../../.dwz/
-        cp -R first/dwz/* ../usr/.dwz/
-        cp -R first/dwz/* ../../usr/.dwz/
-
-        cp -R second/dwz/* ../.dwz/
-        cp -R second/dwz/* ../../.dwz/
-        cp -R second/dwz/* ../usr/.dwz/
-        cp -R second/dwz/* ../../usr/.dwz/
+        apt-get update && apt-get install -y tree        
+        tree first/
+        tree second/
 
     - name: Compare Matching Libs
+      env:
+        start: ${{ inputs.start != '' || 0 }}
+        stop: ${{ inputs.stop != '' || 300 }}
       run: |
         # Ensure we can see Python installs
         export PATH=/opt/conda/bin:$HOME/.local/bin:$PATH
@@ -137,8 +163,13 @@ jobs:
         export PATH=/usr/local/bin:${HOME}/.local/bin:/usr/bin:$PATH
         outdir="${results_dir}/fedora"
         mkdir -p ${outdir}
-        printf "/opt/conda/bin/python test_libs.py ./first ./second ${{ matrix.artifacts[0] }} ${{ matrix.artifacts[1] }} ${outdir}\n"
-        /opt/conda/bin/python test_libs.py ./first ./second ${{ matrix.artifacts[0] }} ${{ matrix.artifacts[1] }} ${outdir}
+        export LIBABIGAIL_DEBUGINFO_DIR1=$PWD/first/usr/lib/debug
+        export LIBABIGAIL_DEBUGINFO_DIR2=$PWD/second/usr/lib/debug
+        export ABILAB_DEBUGINFO_DIR1=$PWD/first/usr/lib/debug
+        export ABILAB_DEBUGINFO_DIR2=$PWD/second/usr/lib/debug
+        #export ABILAB_DISABLE_REPORTS=true
+        printf "/opt/conda/bin/python test_libs.py ./first ./second --os_a ${{ matrix.artifacts[0] }} --os_b ${{ matrix.artifacts[1] }} --outdir ${outdir} --start ${{ env.start }} --stop ${{ env.stop }}\n"
+        /opt/conda/bin/python test_libs.py ./first ./second --os_a ${{ matrix.artifacts[0] }} --os_b ${{ matrix.artifacts[1] }} --outdir ${outdir} --start ${{ env.start }} --stop ${{ env.stop }}
 
     - name: Save result artifact
       uses: actions/upload-artifact@v3

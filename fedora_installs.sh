@@ -14,8 +14,6 @@ dnf install -y elfutils
 
 # install debug info plugin
 dnf install -y dnf-plugins-core
-
-dnf install -y findutils tree
 for lib in "${libs[@]}"; do
    printf "dnf debuginfo-install -y ${lib}\n"
    
