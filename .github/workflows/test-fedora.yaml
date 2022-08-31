@@ -37,11 +37,11 @@ jobs:
            echo ${{ matrix.container[0] }}
            echo ${{ matrix.container[1] }}
 
-      - name: Make More Room
-        run: /bin/bash ./clean.sh
-
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Make More Room
+        run: /bin/bash ./clean.sh
 
       - name: Installation setup
         run: |
