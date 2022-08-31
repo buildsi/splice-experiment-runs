@@ -72,7 +72,7 @@ jobs:
           
       - name: Remove unwanted lib files
         run: |
-          for s in py pyc sob soc socket sod soe sog soh sop; do
+          for s in py pyc sob soc socket sod soe sog soh sop hmac; do
             find libs/ -name "*.$s" -delete
           done
 
