@@ -19,7 +19,19 @@ def recursive_find(base):
 
 
 def get_prefix(lib):
-    return os.path.basename(lib).split(".", 1)[0]
+    """
+      Create a prefix name for `lib`
+      
+      The prefix contains the directory name and all the characters
+      in the file's name up to the first period.
+      
+      Ex:
+         get_prefix("/usr/lib/libfoo.so") == "/usr/lib/libfoo"
+         get_prefix("/usr/lib/libfoo.so.1.2") == "/usr/lib/libfoo"
+    """
+    dirname,filename = os.path.split(lib)
+    prefix = filename.split(".", 1)[0]
+    return os.path.join(dirname,prefix)
 
 
 def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
@@ -59,7 +71,6 @@ def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
             "Looking for match to %s: %s of %s, count %s" % (lib, i, len(libs), count)
         )
         lib = os.path.abspath(lib)
-        lib_dir = os.path.dirname(lib).replace(first, "").strip("/")
         prefix = get_prefix(lib)
         print("Matching prefix %s" % prefix)
         if prefix in prefixes:
