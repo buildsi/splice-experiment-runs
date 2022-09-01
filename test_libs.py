@@ -44,8 +44,14 @@ def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
     prefixes = {}
     found = [x for x in recursive_find(second) if not os.path.relpath(x, start=second).startswith("usr/lib/debug")]
     print("Found %s libs" % len(found))
+
+    # Prefixes are relative to 'second' directory
+    #   If we have
+    #     second='/usr' and lib='/usr/lib/libfoo.so.1'
+    #   then
+    #     prefixes = {'lib/libfoo':'/usr/lib/libfoo.so.1'}
     for lib in found:
-        prefixes[get_prefix(lib)] = lib
+        prefixes[os.path.relpath(get_prefix(lib), start=second)] = lib
 
     # Count in advance and sort so order is meaningful
     libs = [x for x in recursive_find(first) if not os.path.relpath(x, start=first).startswith("usr/lib/debug")]
@@ -68,8 +74,7 @@ def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
         print(
             "Looking for match to %s: %s of %s, count %s" % (lib, i, len(libs), count)
         )
-        lib = os.path.abspath(lib)
-        prefix = get_prefix(lib)
+        prefix = os.path.relpath(get_prefix(lib), start=first)
         print("Matching prefix %s" % prefix)
         if prefix in prefixes:
             second_lib = prefixes[prefix]
