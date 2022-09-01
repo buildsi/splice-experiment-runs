@@ -146,14 +146,9 @@ def main():
     if not args.stop:
         args.stop = 5000
 
-    first = os.path.abspath(args.first)
-    second = os.path.abspath(args.second)
-    outdir = os.path.abspath(sys.argv[5])
-    os.listdir(first)
-    os.listdir(second)
     run_analysis(
-        first=first,
-        second=second,
+        first=args.first,
+        second=args.second,
         os_a=args.os_a,
         os_b=args.os_b,
         outdir=args.outdir,
