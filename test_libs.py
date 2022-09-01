@@ -42,13 +42,13 @@ def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
     """
     # Create a lookup of prefixes for second libs
     prefixes = {}
-    found = [x for x in list(recursive_find(second)) if "debug" not in x and "dwz" not in x]
+    found = [x for x in recursive_find(second) if not os.path.relpath(x, start=second).startswith("usr/lib/debug")]
     print("Found %s libs" % len(found))
     for lib in found:
         prefixes[get_prefix(lib)] = lib
 
     # Count in advance and sort so order is meaningful
-    libs = list(recursive_find(first))
+    libs = [x for x in recursive_find(first) if not os.path.relpath(x, start=first).startswith("usr/lib/debug")]
     libs.sort()
     print("Found %s sorted libs" % len(libs))
     print("Start %s" % start)
@@ -63,8 +63,6 @@ def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
         # Only check within our range specified
         if count < start or count > stop:
             print("Skipping %s" % lib)
-            continue
-        if "debug" in lib or "dwz" in lib:
             continue
         count += 1
         print(
