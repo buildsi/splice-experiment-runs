@@ -10,7 +10,7 @@ on:
       stop:
         description: 'End index for doing analysis'
         required: true
-        default: 2000
+        default: 1500
 
 jobs:
   build:
@@ -145,7 +145,7 @@ jobs:
     - name: Compare Matching Libs
       env:
         start: ${{ inputs.start != '' || 0 }}
-        stop: ${{ inputs.stop != '' || 2000 }}
+        stop: ${{ inputs.stop != '' || 1500 }}
       run: |
         # Ensure we can see Python installs
         export PATH=/opt/conda/bin:$HOME/.local/bin:$PATH
