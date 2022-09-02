@@ -24,7 +24,7 @@ jobs:
       uses: vsoch/uptodate@main
       id: dockerbuild
       with: 
-        root: docker
+        root: ubuntu
         parser: dockerbuild
         flags: "--all"
 
