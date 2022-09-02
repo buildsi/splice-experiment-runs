@@ -1,6 +1,5 @@
 name: ABI Fedora Diffs
 on:
-  pull_request: []
   workflow_dispatch: 
     inputs:
       start:
