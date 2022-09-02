@@ -39,5 +39,5 @@ RUN ldconfig && \
     make all install && \
     ldconfig    
 
-COPY ./install_ubuntu_deps.sh /install-ubuntu-deps.sh
+COPY ./install-ubuntu-deps.sh /install-ubuntu-deps.sh
 RUN /bin/bash /install-ubuntu-deps.sh
