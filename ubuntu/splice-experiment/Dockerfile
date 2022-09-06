@@ -39,6 +39,7 @@ RUN ldconfig && \
     make all install && \
     ldconfig    
 
+ENV PATH=/opt/conda/bin:$PATH
 COPY ./install-ubuntu-deps.sh /install-ubuntu-deps.sh
 RUN /bin/bash /install-ubuntu-deps.sh
 COPY ./run_abi_laboratory.sh /usr/local/bin/run_abi_laboratory.sh
