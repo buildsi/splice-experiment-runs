@@ -144,8 +144,8 @@ jobs:
 
     - name: Compare Matching Libs
       env:
-        start: ${{ inputs.start != '' || 1075 }}
-        stop: ${{ inputs.stop != '' || 1100 }}
+        start: ${{ inputs.start != '' || 850 }}
+        stop: ${{ inputs.stop != '' || 875 }}
       run: |
         # Ensure we can see Python installs
         export PATH=/opt/conda/bin:$HOME/.local/bin:$PATH
