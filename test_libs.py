@@ -19,7 +19,19 @@ def recursive_find(base):
 
 
 def get_prefix(lib):
-    return os.path.basename(lib).split(".", 1)[0]
+    """
+      Create a prefix name for `lib`
+      
+      The prefix contains the directory name and all the characters
+      in the file's name up to the first period.
+      
+      Ex:
+         get_prefix("/usr/lib/libfoo.so") == "/usr/lib/libfoo"
+         get_prefix("/usr/lib/libfoo.so.1.2") == "/usr/lib/libfoo"
+    """
+    dirname,filename = os.path.split(lib)
+    prefix = filename.split(".", 1)[0]
+    return os.path.join(dirname,prefix)
 
 
 def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
@@ -30,13 +42,19 @@ def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
     """
     # Create a lookup of prefixes for second libs
     prefixes = {}
-    found = [x for x in list(recursive_find(second)) if "debug" not in x and "dwz" not in x]
+    found = [x for x in recursive_find(second) if not os.path.relpath(x, start=second).startswith("usr/lib/debug")]
     print("Found %s libs" % len(found))
+
+    # Prefixes are relative to 'second' directory
+    #   If we have
+    #     second='/usr' and lib='/usr/lib/libfoo.so.1'
+    #   then
+    #     prefixes = {'lib/libfoo':'/usr/lib/libfoo.so.1'}
     for lib in found:
-        prefixes[get_prefix(lib)] = lib
+        prefixes[os.path.relpath(get_prefix(lib), start=second)] = lib
 
     # Count in advance and sort so order is meaningful
-    libs = list(recursive_find(first))
+    libs = [x for x in recursive_find(first) if not os.path.relpath(x, start=first).startswith("usr/lib/debug")]
     libs.sort()
     print("Found %s sorted libs" % len(libs))
     print("Start %s" % start)
@@ -48,21 +66,15 @@ def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
     # Match first and second libs on .so
     # These should already be realpath from find_libs.py
     for i, lib in enumerate(libs):
-        print("Contender %s %s of %s" % (lib, i, len(libs)))
         # Only check within our range specified
-        if count < start or count > stop:
+        if i < start or i > stop:
             print("Skipping %s" % lib)
-            continue
-        if "debug" in lib or "dwz" in lib:
-            print("Skipping %s, has debug or dwz" % lib)
             continue
         count += 1
         print(
             "Looking for match to %s: %s of %s, count %s" % (lib, i, len(libs), count)
         )
-        lib = os.path.abspath(lib)
-        lib_dir = os.path.dirname(lib).replace(first, "").strip("/")
-        prefix = get_prefix(lib)
+        prefix = os.path.relpath(get_prefix(lib), start=first)
         print("Matching prefix %s" % prefix)
         if prefix in prefixes:
             second_lib = prefixes[prefix]
@@ -74,6 +86,9 @@ def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
         experiment = "%s-%s-%s" % (prefix, os_a, os_b)
         outfile = os.path.join(outdir, "%s.json" % experiment)
         if not os.path.exists(outfile):
+            lib = os.path.abspath(lib)
+            second_lib = os.path.abspath(second_lib)
+            print("%s vs. %s" %(lib, second_lib))
             run_spliced(lib, second_lib, experiment, outfile)
 
 
@@ -137,14 +152,9 @@ def main():
     if not args.stop:
         args.stop = 5000
 
-    first = os.path.abspath(args.first)
-    second = os.path.abspath(args.second)
-    outdir = os.path.abspath(sys.argv[5])
-    os.listdir(first)
-    os.listdir(second)
     run_analysis(
-        first=first,
-        second=second,
+        first=args.first,
+        second=args.second,
         os_a=args.os_a,
         os_b=args.os_b,
         outdir=args.outdir,

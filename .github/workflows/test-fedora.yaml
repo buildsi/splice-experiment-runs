@@ -1,5 +1,6 @@
 name: ABI Fedora Diffs
 on:
+  pull_request: []
   workflow_dispatch: 
     inputs:
       start:
@@ -9,8 +10,7 @@ on:
       stop:
         description: 'End index for doing analysis'
         required: true
-        default: 5000
-
+        default: 300
 
 jobs:
   build:
@@ -37,13 +37,11 @@ jobs:
            echo ${{ matrix.container[0] }}
            echo ${{ matrix.container[1] }}
 
-      - name: Make Space For Build
-        run: |        
-          rm -rf /usr/share/dotnet
-          rm -rf /opt/ghc
-
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Make More Room
+        run: /bin/bash ./clean.sh
 
       - name: Installation setup
         run: |
@@ -74,7 +72,7 @@ jobs:
           
       - name: Remove unwanted lib files
         run: |
-          for s in py pyc sob soc socket sod soe sog soh sop; do
+          for s in py pyc sob soc socket sod soe sog soh sop hmac; do
             find libs/ -name "*.$s" -delete
           done
 
@@ -108,16 +106,15 @@ jobs:
 
     name: ${{ matrix.artifacts[0] }} vs ${{ matrix.artifacts[1] }}
     steps:
-    - name: Make More Room
-      run: |        
-        rm -rf /usr/share/dotnet
-        rm -rf /opt/ghc
 
     - name: Update container base with predictors and spliced
       uses: buildsi/smeagle-examples/actions/install@main
 
     - name: Checkout
       uses: actions/checkout@v3
+
+    - name: Make More Room
+      run: /bin/bash ./clean.sh
 
     - name: Download First Version
       uses: actions/download-artifact@v2
@@ -147,8 +144,8 @@ jobs:
 
     - name: Compare Matching Libs
       env:
-        start: ${{ inputs.start != '' || 0 }}
-        stop: ${{ inputs.stop != '' || 300 }}
+        start: ${{ inputs.start != '' || 350 }}
+        stop: ${{ inputs.stop != '' || 375 }}
       run: |
         # Ensure we can see Python installs
         export PATH=/opt/conda/bin:$HOME/.local/bin:$PATH
