@@ -11,11 +11,19 @@ import spliced.experiment.manual
 import spliced.utils as utils
 from spliced.logger import logger
 
+# Test libs manual takes an input directory and subdirectory pattern
+# to match, and then compares all pairs within it.
+
 
 def recursive_find(base):
     for root, _, filenames in os.walk(base):
         for filename in filenames:
             yield os.path.join(root, filename)
+
+
+def write_json(data, filename):
+    with open(filename, "w") as fd:
+        fd.write(json.dumps(data, indent=4))
 
 
 def get_prefix(lib):
@@ -34,7 +42,7 @@ def get_prefix(lib):
     return os.path.join(dirname, prefix)
 
 
-def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
+def run_analysis(first, second, os_a, os_b, outdir):
     """
     Main function to run the analysis between a first and second output
     directory. We have added start/stop indices for libraries because
@@ -42,11 +50,7 @@ def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
     """
     # Create a lookup of prefixes for second libs
     prefixes = {}
-    found = [
-        x
-        for x in recursive_find(second)
-        if not os.path.relpath(x, start=second).startswith("usr/lib/debug")
-    ]
+    found = [x for x in recursive_find(second) if ".so" in x and "lib" in x]
     print("Found %s libs" % len(found))
 
     # Prefixes are relative to 'second' directory
@@ -58,30 +62,16 @@ def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
         prefixes[os.path.relpath(get_prefix(lib), start=second)] = lib
 
     # Count in advance and sort so order is meaningful
-    libs = [
-        x
-        for x in recursive_find(first)
-        if not os.path.relpath(x, start=first).startswith("usr/lib/debug")
-    ]
+    libs = [x for x in recursive_find(first) if ".so" in x and "lib" in x]
     libs.sort()
-    print("Found %s sorted libs" % len(libs))
-    print("Start %s" % start)
-    print("Stop %s" % stop)
 
-    # Count libs separately
-    count = 0
+    print("Found %s sorted libs" % len(libs))
 
     # Match first and second libs on .so
     # These should already be realpath from find_libs.py
     for i, lib in enumerate(libs):
         # Only check within our range specified
-        if i < start or i > stop:
-            print("Skipping %s" % lib)
-            continue
-        count += 1
-        print(
-            "Looking for match to %s: %s of %s, count %s" % (lib, i, len(libs), count)
-        )
+        print("Looking for match to %s: %s of %s" % (lib, i, len(libs)))
         prefix = os.path.relpath(get_prefix(lib), start=first)
         print("Matching prefix %s" % prefix)
         if prefix in prefixes:
@@ -121,16 +111,14 @@ def get_parser():
         description="Fedora Test Runner",
         formatter_class=argparse.RawTextHelpFormatter,
     )
-    parser.add_argument("first", help="first library directory to parse (positional)")
-    parser.add_argument("second", help="second library directory to parse (positional)")
-    parser.add_argument("--os_a", help="operating system tag for first")
-    parser.add_argument("--os_b", help="operating system tag for second")
-    parser.add_argument("--outdir", help="output directory")
-    parser.add_argument("--start", help="start index in sorted libraries", default=0)
+    # Assume root is bound to data
     parser.add_argument(
-        "--stop", help="stopping index in sorted libraries", default=5000
+        "root", help="root directory with subdirectories", default="/data"
     )
-
+    parser.add_argument(
+        "pattern", help="pattern of subdirectory to match (defaults to *)", default="*"
+    )
+    parser.add_argument("--outdir", help="output directory")
     return parser
 
 
@@ -139,36 +127,34 @@ def main():
     args, extra = parser.parse_known_args()
 
     # Show args to the user
-    print("      first: %s" % args.first)
-    print("     second: %s" % args.second)
-    print("       os_a: %s" % args.os_a)
-    print("       os_b: %s" % args.os_b)
+    print("      root: %s" % args.root)
     print("     outdir: %s" % args.outdir)
-    print("      start: %s" % args.start)
-    print("       stop: %s" % args.stop)
 
-    if not args.first or not args.second:
-        sys.exit(
-            "A first and second directory of libs are required as positional arguments."
-        )
+    if not args.root or not os.listdir(args.root):
+        sys.exit("A root directory with subdirectories for OS versions is required.")
 
     if not args.outdir:
         sys.exit("An output directory --outdir is required.")
 
-    if not args.start:
-        args.start = 0
-    if not args.stop:
-        args.stop = 5000
-
-    run_analysis(
-        first=args.first,
-        second=args.second,
-        os_a=args.os_a,
-        os_b=args.os_b,
-        outdir=args.outdir,
-        start=int(args.start),
-        stop=int(args.stop),
-    )
+    seen = set()
+    for dirA in os.listdir(args.root):
+        if not args.pattern in dirA:
+            continue
+        for dirB in os.listdir(args.root):
+            if not args.pattern in dirB:
+                continue
+            uid = "-".join(sorted([dirA, dirB]))
+            if uid in seen or dirA == dirB:
+                continue
+            seen.add(uid)
+            print(uid)
+            run_analysis(
+                first=os.path.join(args.root, dirA),
+                second=os.path.join(args.root, dirB),
+                os_a=dirA,
+                os_b=dirB,
+                outdir=args.outdir,
+            )
 
 
 if __name__ == "__main__":
