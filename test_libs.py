@@ -156,7 +156,7 @@ def get_symbols(path):
         return {}
     symbols = [x.strip() for x in utils.read_file(out).split("\n") if x.strip()]
     os.remove(out)
-    return symbols
+    return {"symbols": symbols}
 
 
 def run_symbols_diff(A, B, first, second, experiment_name, outfile):
