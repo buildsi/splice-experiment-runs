@@ -126,20 +126,21 @@ def get_debug_file(e, path):
         debug_info = (
             debug_info.decode("utf-8", errors="replace").split("debug")[0] + "debug"
         )
-        debug_file = os.path.basename(debug_info)
+    debug_file = os.path.basename(debug_info)
     print(f"Looking for debug file {debug_file}")
 
     # Add the library specific search path
     debug_paths = debug_dirs.copy()
     debug_paths.append(path)
 
-    # Look for debug indfo
+    # Look for debug info
     finds = []
     if not os.path.exists(debug_info):
         for root in debug_paths:
-            finds += list(utils.recursive_find(root, debug_info))
+            finds += [x for x in recursive_find(root) if debug_file in x]
     print(finds)
     if not finds:
+        print("No debug file found")
         return None
     return finds[0]
 
@@ -158,6 +159,7 @@ def get_symbols(path):
         return {}
     symbols = [x.strip() for x in utils.read_file(out).split("\n") if x.strip()]
     os.remove(out)
+    print("Found %s symbols" % len(symbols))
     return {"symbols": symbols}
 
 

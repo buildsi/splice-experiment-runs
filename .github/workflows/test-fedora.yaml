@@ -10,7 +10,7 @@ on:
       stop:
         description: 'End index for doing analysis'
         required: true
-        default: 800
+        default: 2000
 
 jobs:
   build:
@@ -52,7 +52,7 @@ jobs:
         run: |
           mkdir -p ./libs
           dnf install -y findutils tree
-          #/bin/bash fedora_installs.sh
+          /bin/bash fedora_installs.sh
 
       - name: Install complete debuginfo files
         run: |
@@ -145,7 +145,7 @@ jobs:
     - name: Compare Matching Libs
       env:
         start: ${{ inputs.start != '' || 0 }}
-        stop: ${{ inputs.stop != '' || 800 }}
+        stop: ${{ inputs.stop != '' || 2000 }}
       run: |
         # Ensure we can see Python installs
         export PATH=/opt/conda/bin:$HOME/.local/bin:$PATH
