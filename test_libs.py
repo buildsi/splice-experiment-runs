@@ -9,7 +9,6 @@ import shutil
 import json
 
 import spliced.experiment.manual
-from elfcall.main import elf
 import spliced.utils as utils
 from spliced.predict.base import time_run_decorator
 from spliced.logger import logger
@@ -172,6 +171,7 @@ def run_symbols_diff(A, B, first, second, experiment_name, outfile):
 
     first and second are the roots with debug info to find.
     """
+    from elfcall.main import elf
     Aelf = elf.ElfFile(os.path.realpath(A), os.path.basename(A))
     Belf = elf.ElfFile(os.path.realpath(B), os.path.basename(B))
 
@@ -190,8 +190,8 @@ def run_symbols_diff(A, B, first, second, experiment_name, outfile):
         return
 
     # Run nm for each
-    before = get_symbols(Aelf)
-    after = get_symbols(Belf)
+    before = get_symbols(debugA)
+    after = get_symbols(debugB)
     missing_symbols = [x for x in before["symbols"] if x not in after["symbols"]]
     result["message"] = missing_symbols
     result["prediction"] = not missing_symbols

@@ -147,7 +147,6 @@ jobs:
         start: ${{ inputs.start != '' || 0 }}
         stop: ${{ inputs.stop != '' || 2000 }}
       run: |
-        # Ensure we can see Python installs
         export PATH=/opt/conda/bin:$HOME/.local/bin:$PATH
         results_dir=/tmp/results
         cache_dir=/tmp/cache
