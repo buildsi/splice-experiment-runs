@@ -127,7 +127,7 @@ def get_debug_file(e, path):
         debug_info = (
             debug_info.decode("utf-8", errors="replace").split("debug")[0] + "debug"
         )
-        debug_file = os.path.basename(debug_info)
+    debug_file = os.path.basename(debug_info)
     print(f"Looking for debug file {debug_file}")
 
     # Add the library specific search path
@@ -138,9 +138,10 @@ def get_debug_file(e, path):
     finds = []
     if not os.path.exists(debug_info):
         for root in debug_paths:
-            finds += [x for x in recursive_find(root) if debug_info in x]
+            finds += [x for x in recursive_find(root) if debug_file in x]
     print(finds)
     if not finds:
+        print("No debug file found")
         return None
     return finds[0]
 
