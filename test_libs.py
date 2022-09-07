@@ -151,7 +151,10 @@ def get_symbols(path):
     Run nm to get symbols
     """
     out = tempfile.mktemp(suffix=".txt")
-    res = os.system("nm %s --format=posix --defined-only | awk '{ if ($2 == \"T\" || $2 == \"t\" || $2 == \"D\") print $1 }' | sort > %s" %(path, out))
+    res = os.system(
+        'nm %s --format=posix --defined-only | awk \'{ if ($2 == "T" || $2 == "t" || $2 == "D") print $1 }\' | sort > %s'
+        % (path, out)
+    )
     if res != 0:
         return {}
     symbols = [x.strip() for x in utils.read_file(out).split("\n") if x.strip()]
@@ -186,12 +189,16 @@ def run_symbols_diff(A, B, first, second, experiment_name, outfile):
         return
 
     # Run nm for each
-    before = get_symbols(Aelf).get("symbols")
-    after = get_symbols(Belf).get("symbols")
-    missing_symbols = [x for x in before if x not in after]
+    before = get_symbols(Aelf)
+    after = get_symbols(Belf)
+    missing_symbols = [x for x in before["symbols"] if x not in after["symbols"]]
     result["message"] = missing_symbols
     result["prediction"] = not missing_symbols
-    result['time'] = before['seconds'] + after['seconds']
+    result["time"] = before["seconds"] + after["seconds"]
+    print(
+        "Found %s missing symbols in %s seconds"
+        % (len(missing_symbols), result["time"])
+    )
     utils.mkdir_p(os.path.dirname(os.path.abspath(outfile)))
     utils.write_json(result, outfile)
 
