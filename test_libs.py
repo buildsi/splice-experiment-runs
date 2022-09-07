@@ -134,11 +134,11 @@ def get_debug_file(e, path):
     debug_paths = debug_dirs.copy()
     debug_paths.append(path)
 
-    # Look for debug indfo
+    # Look for debug info
     finds = []
     if not os.path.exists(debug_info):
         for root in debug_paths:
-            finds += list(utils.recursive_find(root, debug_info))
+            finds += [x for x in recursive_find(root) if debug_info in x]
     print(finds)
     if not finds:
         return None
