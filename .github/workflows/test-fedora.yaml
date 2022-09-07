@@ -52,7 +52,7 @@ jobs:
         run: |
           mkdir -p ./libs
           dnf install -y findutils tree
-          /bin/bash fedora_installs.sh
+          #/bin/bash fedora_installs.sh
 
       - name: Install complete debuginfo files
         run: |

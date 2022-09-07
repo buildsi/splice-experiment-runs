@@ -3,11 +3,14 @@
 import argparse
 import os
 import sys
+import shutil
 import tempfile
+import subprocess
 
 import spliced.experiment.manual
 import spliced.utils as utils
-from elfcall.main import elf
+
+# from elfcall.main import elf
 from spliced.predict.base import time_run_decorator
 
 debug_dirs = ["/usr/bin/.debug", "/usr/lib/debug"]
@@ -108,11 +111,10 @@ def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
             run_symbols_diff(lib, second_lib, first, second, experiment, outfile)
 
 
-def get_debug_file(e, path):
+def get_debug_file(debug_info, path):
     """
     Given a loaded elf, parse the debuginfo path
     """
-    debug_info = e.gnu_debuglink
     if not debug_info:
         print("Elf does not have gnu_debuglink")
         return
@@ -164,22 +166,26 @@ def run_symbols_diff(A, B, first, second, experiment_name, outfile):
     The spliced symbols predictor cannot read debug direcly, so
     we try it here instead.
 
-    nm libz.so.1.2.11-1.2.11-31.fc36.x86_64.debug --format=posix --defined-only | awk '{ if ($2 == "T" || $2 == "t" || $2 == "D") print $1 }' | sort > <outfile>
-
     first and second are the roots with debug info to find.
     """
-    Aelf = elf.ElfFile(os.path.realpath(A), os.path.basename(A))
-    Belf = elf.ElfFile(os.path.realpath(B), os.path.basename(B))
+    dest = tempfile.mkdtemp()
+    with_debug_a = os.path.join(dest, os.path.basename(A))
+    with_debug_b = os.path.join(dest, os.path.basename(A))
 
-    debugA = get_debug_file(Aelf, first)
-    debugB = get_debug_file(Belf, second)
+    # Generate new so with debug
+    debugA = add_debug_info(A, with_debug_a, first)
+    debugB = add_debug_info(B, with_debug_b, second)
+
+    # Aelf = elf.ElfFile(os.path.realpath(A), os.path.basename(A))
+    # Belf = elf.ElfFile(os.path.realpath(B), os.path.basename(B))
+
+    # debugA = get_debug_file(Aelf.gnu_debuglink, first)
+    # debugB = get_debug_file(Belf.gnu_debuglink, second)
     result = {
         "splice_type": "same_lib",
         "original_lib": A,
         "spliced_lib": B,
         "command": "missing-previously-found-symbols",
-        "original_debug": debugA,
-        "spliced_debug": debugB,
     }
 
     if not debugA or not debugB:
@@ -200,6 +206,39 @@ def run_symbols_diff(A, B, first, second, experiment_name, outfile):
     )
     utils.mkdir_p(os.path.dirname(os.path.abspath(outfile)))
     utils.write_json(result, outfile)
+    shutil.rmtree(dest)
+
+
+def add_debug_info(lib, dest_lib, path):
+    """
+    Get lookup of debug file prefixes.
+    """
+    print("Looking for debuginfo file for %s" % lib)
+    cmd = ["eu-readelf", "--string-dump=.gnu_debuglink", lib]
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = p.communicate()
+    if p.returncode != 0:
+        sys.exit(f"Issue asking for debug for {lib}")
+    lines = [
+        x for x in stdout.decode("utf-8", errors="ignore").split("\n") if x.strip()
+    ]
+    debug_link = lines[1]
+    debug_link = debug_link.split(" ")[-1]
+
+    # This finds the debug file in the path somewhere
+    debug_file = get_debug_file(debug_link, path)
+    print("Looking for name %s" % debug_file)
+    if not debug_file:
+        print("Cannot find debug file in %s" % debug_file)
+        return
+
+    cmd = ["eu-unstrip", lib, debug_file, "-o", dest_lib]
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = p.communicate()
+    if p.returncode != 0:
+        print(f"Issue adding debug info back {stderr}")
+        return
+    return dest_lib
 
 
 def run_spliced(A, B, experiment_name, outfile):
