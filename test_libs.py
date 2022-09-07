@@ -4,14 +4,11 @@ import argparse
 import os
 import sys
 import tempfile
-import fnmatch
-import shutil
-import json
 
 import spliced.experiment.manual
 import spliced.utils as utils
+from elfcall.main import elf
 from spliced.predict.base import time_run_decorator
-from spliced.logger import logger
 
 debug_dirs = ["/usr/bin/.debug", "/usr/lib/debug"]
 
@@ -171,7 +168,6 @@ def run_symbols_diff(A, B, first, second, experiment_name, outfile):
 
     first and second are the roots with debug info to find.
     """
-    from elfcall.main import elf
     Aelf = elf.ElfFile(os.path.realpath(A), os.path.basename(A))
     Belf = elf.ElfFile(os.path.realpath(B), os.path.basename(B))
 
@@ -182,6 +178,8 @@ def run_symbols_diff(A, B, first, second, experiment_name, outfile):
         "original_lib": A,
         "spliced_lib": B,
         "command": "missing-previously-found-symbols",
+        "original_debug": debugA,
+        "spliced_debug": debugB,
     }
 
     if not debugA or not debugB:
