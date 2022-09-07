@@ -160,6 +160,7 @@ def get_symbols(path):
         return {}
     symbols = [x.strip() for x in utils.read_file(out).split("\n") if x.strip()]
     os.remove(out)
+    print("Found %s symbols" % len(symbols))
     return {"symbols": symbols}
 
 
