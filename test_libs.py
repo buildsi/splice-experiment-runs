@@ -172,7 +172,7 @@ def run_symbols_diff(A, B, first, second, experiment_name, outfile):
     """
     dest = tempfile.mkdtemp()
     with_debug_a = os.path.join(dest, os.path.basename(A))
-    with_debug_b = os.path.join(dest, os.path.basename(A))
+    with_debug_b = os.path.join(dest, os.path.basename(B))
 
     # Generate new so with debug
     debugA = add_debug_info(A, with_debug_a, first)
