@@ -3,12 +3,15 @@
 import argparse
 import os
 import sys
+import tempfile
 import fnmatch
 import shutil
 import json
 
 import spliced.experiment.manual
+from elfcall.main import elf
 import spliced.utils as utils
+from spliced.predict.base import time_run_decorator
 from spliced.logger import logger
 
 
@@ -93,11 +96,104 @@ def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
 
         experiment = "%s-%s-%s" % (prefix, os_a, os_b)
         outfile = os.path.join(outdir, "%s.json" % experiment)
+        # if not os.path.exists(outfile):
+        #    lib = os.path.abspath(lib)
+        #    second_lib = os.path.abspath(second_lib)
+        #    print("%s vs. %s" % (lib, second_lib))
+        #    run_spliced(lib, second_lib, experiment, outfile)
+
+        outfile = os.path.join(outdir, "symbols_%s.json" % experiment)
         if not os.path.exists(outfile):
             lib = os.path.abspath(lib)
             second_lib = os.path.abspath(second_lib)
-            print("%s vs. %s" % (lib, second_lib))
-            run_spliced(lib, second_lib, experiment, outfile)
+            print("Symbols %s vs. %s" % (lib, second_lib))
+            run_symbols_diff(lib, second_lib, first, second, experiment, outfile)
+
+
+debug_dirs = ["/usr/bin/.debug", "/usr/lib/debug"]
+
+
+def get_debug_file(e, path):
+    """
+    Given a loaded elf, parse the debuginfo path
+    """
+    debug_info = e.gnu_debuglink
+    if not debug_info:
+        print("Elf does not have gnu_debuglink")
+        return
+
+    # Add extra debug directories - Fedora all ends with .debug
+    if isinstance(debug_info, bytes):
+        debug_info = (
+            debug_info.decode("utf-8", errors="replace").split("debug")[0] + "debug"
+        )
+        debug_file = os.path.basename(debug_info)
+    print(f"Looking for debug file {debug_file}")
+
+    # Add the library specific search path
+    debug_paths = debug_dirs.copy()
+    debug_paths.append(path)
+
+    # Look for debug indfo
+    finds = []
+    if not os.path.exists(debug_info):
+        for root in debug_paths:
+            finds += list(utils.recursive_find(root, debug_info))
+    print(finds)
+    if not finds:
+        return None
+    return finds[0]
+
+
+@time_run_decorator
+def get_symbols(path):
+    """
+    Run nm to get symbols
+    """
+    out = tempfile.mktemp(suffix=".txt")
+    res = os.system(f"nm {path} --format=posix --defined-only | awk '{ if ($2 == \"T\" || $2 == \"t\" || $2 == \"D\") print $1 }' | sort > {out}")
+    if res != 0:
+        return {}
+    symbols = [x.strip() for x in utils.read_file(out).split("\n") if x.strip()]
+    os.remove(out)
+    return symbols
+
+
+def run_symbols_diff(A, B, first, second, experiment_name, outfile):
+    """
+    The spliced symbols predictor cannot read debug direcly, so
+    we try it here instead.
+
+    nm libz.so.1.2.11-1.2.11-31.fc36.x86_64.debug --format=posix --defined-only | awk '{ if ($2 == "T" || $2 == "t" || $2 == "D") print $1 }' | sort > <outfile>
+
+    first and second are the roots with debug info to find.
+    """
+    Aelf = elf.ElfFile(os.path.realpath(A), os.path.basename(A))
+    Belf = elf.ElfFile(os.path.realpath(B), os.path.basename(B))
+
+    debugA = get_debug_file(Aelf, first)
+    debugB = get_debug_file(Belf, second)
+    result = {
+        "splice_type": "same_lib",
+        "original_lib": A,
+        "spliced_lib": B,
+        "command": "missing-previously-found-symbols",
+    }
+
+    if not debugA or not debugB:
+        print("One of A or B missing debug data.")
+        result["message"] = "Missing debug data."
+        return
+
+    # Run nm for each
+    before = get_symbols(Aelf).get("symbols")
+    after = get_symbols(Belf).get("symbols")
+    missing_symbols = [x for x in before if x not in after]
+    result["message"] = missing_symbols
+    result["prediction"] = not missing_symbols
+    result['time'] = before['seconds'] + after['seconds']
+    utils.mkdir_p(os.path.dirname(os.path.abspath(outfile)))
+    utils.write_json(result, outfile)
 
 
 def run_spliced(A, B, experiment_name, outfile):
