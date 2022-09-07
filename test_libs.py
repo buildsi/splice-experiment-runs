@@ -108,8 +108,10 @@ def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
             lib = os.path.abspath(lib)
             second_lib = os.path.abspath(second_lib)
             print("Symbols %s vs. %s" % (lib, second_lib))
-            run_symbols_diff(lib, second_lib, first, second, experiment, outfile)
-
+            try:
+                run_symbols_diff(lib, second_lib, first, second, experiment, outfile)
+            except:
+                print(f'Issue with {lib} and {second_lib}')
 
 def get_debug_file(debug_info, path):
     """
