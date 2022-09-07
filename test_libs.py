@@ -14,6 +14,8 @@ import spliced.utils as utils
 from spliced.predict.base import time_run_decorator
 from spliced.logger import logger
 
+debug_dirs = ["/usr/bin/.debug", "/usr/lib/debug"]
+
 
 def recursive_find(base):
     for root, _, filenames in os.walk(base):
@@ -108,9 +110,6 @@ def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
             second_lib = os.path.abspath(second_lib)
             print("Symbols %s vs. %s" % (lib, second_lib))
             run_symbols_diff(lib, second_lib, first, second, experiment, outfile)
-
-
-debug_dirs = ["/usr/bin/.debug", "/usr/lib/debug"]
 
 
 def get_debug_file(e, path):
