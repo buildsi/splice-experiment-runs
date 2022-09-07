@@ -151,7 +151,7 @@ def get_symbols(path):
     Run nm to get symbols
     """
     out = tempfile.mktemp(suffix=".txt")
-    res = os.system(f"nm {path} --format=posix --defined-only | awk '{ if ($2 == \"T\" || $2 == \"t\" || $2 == \"D\") print $1 }' | sort > {out}")
+    res = os.system("nm %s --format=posix --defined-only | awk '{ if ($2 == \"T\" || $2 == \"t\" || $2 == \"D\") print $1 }' | sort > %s" %(path, out))
     if res != 0:
         return {}
     symbols = [x.strip() for x in utils.read_file(out).split("\n") if x.strip()]
