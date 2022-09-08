@@ -12,6 +12,10 @@ on:
         required: true
         default: 2000
 
+env:
+  start: 0
+  stop: 50
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -144,8 +148,8 @@ jobs:
 
     - name: Compare Matching Libs
       env:
-        start: ${{ inputs.start != '' || 0 }}
-        stop: ${{ inputs.stop != '' || 50 }}
+        start: ${{ inputs.start != '' || env.start }}
+        stop: ${{ inputs.stop != '' || env.stop }}
       run: |
         export PATH=/opt/conda/bin:$HOME/.local/bin:$PATH
         results_dir=/tmp/results
@@ -163,7 +167,6 @@ jobs:
         export LIBABIGAIL_DEBUGINFO_DIR2=$PWD/second/usr/lib/debug
         export ABILAB_DEBUGINFO_DIR1=$PWD/first/usr/lib/debug
         export ABILAB_DEBUGINFO_DIR2=$PWD/second/usr/lib/debug
-        export ABILAB_DISABLE_REPORTS=true
         printf "/opt/conda/bin/python test_libs.py ./first ./second --os_a ${{ matrix.artifacts[0] }} --os_b ${{ matrix.artifacts[1] }} --outdir ${outdir} --start ${{ env.start }} --stop ${{ env.stop }}\n"
         /opt/conda/bin/python test_libs.py ./first ./second --os_a ${{ matrix.artifacts[0] }} --os_b ${{ matrix.artifacts[1] }} --outdir ${outdir} --start ${{ env.start }} --stop ${{ env.stop }}
 
