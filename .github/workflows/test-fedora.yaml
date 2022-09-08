@@ -21,10 +21,10 @@ jobs:
       fail-fast: false
       matrix:
         # container, compiler inside to use, and name+version to save
-        container: [['ghcr.io/buildsi/fedora:fedora-34', "34"],
-                    ['ghcr.io/buildsi/fedora:fedora-35', "35"],
-                    ['ghcr.io/buildsi/fedora:fedora-36', "36"],
-                    ['ghcr.io/buildsi/fedora:fedora-37', "37"]]
+        container: [['ghcr.io/buildsi/fedora-34', "34"],
+                    ['ghcr.io/buildsi/fedora-35', "35"],
+                    ['ghcr.io/buildsi/fedora-36', "36"],
+                    ['ghcr.io/buildsi/fedora-37', "37"]]
 
     container:
       image: ${{ matrix.container[0] }}
@@ -145,7 +145,7 @@ jobs:
     - name: Compare Matching Libs
       env:
         start: ${{ inputs.start != '' || 0 }}
-        stop: ${{ inputs.stop != '' || 2000 }}
+        stop: ${{ inputs.stop != '' || 50 }}
       run: |
         export PATH=/opt/conda/bin:$HOME/.local/bin:$PATH
         results_dir=/tmp/results

@@ -10,7 +10,6 @@ import subprocess
 import spliced.experiment.manual
 import spliced.utils as utils
 
-# from elfcall.main import elf
 from spliced.predict.base import time_run_decorator
 
 debug_dirs = ["/usr/bin/.debug", "/usr/lib/debug"]
@@ -97,11 +96,11 @@ def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
 
         experiment = "%s-%s-%s" % (prefix, os_a, os_b)
         outfile = os.path.join(outdir, "%s.json" % experiment)
-        # if not os.path.exists(outfile):
-        #    lib = os.path.abspath(lib)
-        #    second_lib = os.path.abspath(second_lib)
-        #    print("%s vs. %s" % (lib, second_lib))
-        #    run_spliced(lib, second_lib, experiment, outfile)
+        if not os.path.exists(outfile):
+            lib = os.path.abspath(lib)
+            second_lib = os.path.abspath(second_lib)
+            print("%s vs. %s" % (lib, second_lib))
+            run_spliced(lib, second_lib, experiment, outfile)
 
         outfile = os.path.join(outdir, "symbols_%s.json" % experiment)
         if not os.path.exists(outfile):
@@ -111,7 +110,8 @@ def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
             try:
                 run_symbols_diff(lib, second_lib, first, second, experiment, outfile)
             except:
-                print(f'Issue with {lib} and {second_lib}')
+                print(f"Issue with {lib} and {second_lib}")
+
 
 def get_debug_file(debug_info, path):
     """
@@ -178,11 +178,6 @@ def run_symbols_diff(A, B, first, second, experiment_name, outfile):
     debugA = add_debug_info(A, with_debug_a, first)
     debugB = add_debug_info(B, with_debug_b, second)
 
-    # Aelf = elf.ElfFile(os.path.realpath(A), os.path.basename(A))
-    # Belf = elf.ElfFile(os.path.realpath(B), os.path.basename(B))
-
-    # debugA = get_debug_file(Aelf.gnu_debuglink, first)
-    # debugB = get_debug_file(Belf.gnu_debuglink, second)
     result = {
         "splice_type": "same_lib",
         "original_lib": A,
