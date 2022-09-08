@@ -152,8 +152,8 @@ jobs:
         cache_dir=/tmp/cache
         mkdir -p ${results_dir} ${cache_dir}
         # cache will save time but take up more space
-        # export SPLICED_SMEAGLE_CACHE_DIR=${cache_dir}
-        # export SPLICED_ABILAB_CACHE_DIR=${cache_dir}
+        export SPLICED_SMEAGLE_CACHE_DIR=${cache_dir}
+        export SPLICED_ABILAB_CACHE_DIR=${cache_dir}
         printf "Results: ${results_dir}\n"
         printf "Cache: ${cache_dir}\n"
         export PATH=/usr/local/bin:${HOME}/.local/bin:/usr/bin:$PATH
