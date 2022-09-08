@@ -5,13 +5,13 @@ See the [splice-experiment](https://github.com/buildsi/spliced-experiment) repos
 and the [.github/analysis.yaml](.github/analysis.yaml) for how the automation works,
 and [here](https://github.com/buildsi/smeagle-examples) for the actions.
 
-## Symbols
+## Manual Symbols
 
-For runs with symbols it was a simple case of building a library with spack, 
-and then comparing across versions. Spliced can do this internally with a spack
-splice, but instead we really want to do the same procedure as with two different
-libs and install the libs separately and provide the paths. Here is how to do that.
-Clone spack:
+If you want to do a run with manual libraries (e.g., from spack) it is a 
+simple case of building a library with spack, and then comparing across versions.
+Spliced can do this internally with a spack splice, but instead we really want 
+to do the same procedure as with two different libs and install the libs 
+separately and provide the paths. Here is how to do that. Clone spack:
 
 ```bash
 $ git clone git@github.com:spack/spack
@@ -52,5 +52,4 @@ staying in the same compiler version/space.
 $ python /runs/test_libs_manual.py /spack/opt/spack/linux-ubuntu20.04-skylake/gcc-9.4.0 binutils --outdir /runs/results/manual/binutils
 ```
 
-That will save results (json files) to the directory you created. We will add them to
-[https://github.com/buildsi/splice-experiment-results](https://github.com/buildsi/splice-experiment-results)
+That will save results (json files) to the directory you created.
