@@ -50,18 +50,16 @@ jobs:
     # Pre-generated artifacts from
     # https://github.com/buildsi/splice-experiment-runs/actions/runs/3014787550
     - name: Download First Version
-      uses: dawidd6/action-download-artifact@v2
-      with:
-        run_id: 3014787550
-        name: ${{ matrix.artifacts[0] }}
-        path: ./first 
+      env:
+        INPUT_OUTPUT: ./first
+        INPUT_NAME: ${{ matrix.artifacts[0] }}
+      run: python get_artifacts.py 3014787550
                
     - name: Download Second Version
-      uses: dawidd6/action-download-artifact@v2
-      with:
-        run_id: 3014787550
-        name: ${{ matrix.artifacts[1] }}
-        path: ./second
+      env:
+        INPUT_OUTPUT: ./first
+        INPUT_NAME: ${{ matrix.artifacts[1] }}
+      run: python get_artifacts.py 3014787550
 
     - name: Reconstruct debug directories
       run: |
