@@ -54,14 +54,18 @@ jobs:
         INPUT_OUTPUT: ./first
         INPUT_NAME: ${{ matrix.artifacts[0] }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: python get_artifacts.py 3014787550
-               
+      run: |
+        export PATH=/opt/conda/bin:$HOME/.local/bin:$PATH
+        python3 get_artifacts.py 3014787550
+        
     - name: Download Second Version
       env:
         INPUT_OUTPUT: ./first
         INPUT_NAME: ${{ matrix.artifacts[1] }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: python get_artifacts.py 3014787550
+      run: |
+        export PATH=/opt/conda/bin:$HOME/.local/bin:$PATH
+        python3 get_artifacts.py 3014787550
 
     - name: Reconstruct debug directories
       run: |
