@@ -13,8 +13,8 @@ on:
         default: 2000
 
 env:
-  start: 250
-  stop: 350
+  start: 350
+  stop: 450
 
 jobs:
   build:
