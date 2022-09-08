@@ -144,8 +144,8 @@ jobs:
 
     - name: Compare Matching Libs
       env:
-        start: ${{ inputs.start != '' || 50 }}
-        stop: ${{ inputs.stop != '' || 100 }}
+        start: ${{ inputs.start != '' || 0 }}
+        stop: ${{ inputs.stop != '' || 50 }}
       run: |
         export PATH=/opt/conda/bin:$HOME/.local/bin:$PATH
         results_dir=/tmp/results
