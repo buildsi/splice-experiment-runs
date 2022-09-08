@@ -102,15 +102,21 @@ def run_analysis(first, second, os_a, os_b, outdir, start=0, stop=5000):
             print("%s vs. %s" % (lib, second_lib))
             run_spliced(lib, second_lib, experiment, outfile)
 
-        outfile = os.path.join(outdir, "symbols_%s.json" % experiment)
-        if not os.path.exists(outfile):
-            lib = os.path.abspath(lib)
-            second_lib = os.path.abspath(second_lib)
-            print("Symbols %s vs. %s" % (lib, second_lib))
-            try:
-                run_symbols_diff(lib, second_lib, first, second, experiment, outfile)
-            except:
-                print(f"Issue with {lib} and {second_lib}")
+        # Assume we can now remove the libs to make space
+        del prefixes[prefix]
+        os.remove(lib)
+        os.remove(second_lib)
+
+        # This was second (largely unecessary) symbol analysis
+        # outfile = os.path.join(outdir, "symbols_%s.json" % experiment)
+        # if not os.path.exists(outfile):
+        #    lib = os.path.abspath(lib)
+        #    second_lib = os.path.abspath(second_lib)
+        #    print("Symbols %s vs. %s" % (lib, second_lib))
+        #    try:
+        #        run_symbols_diff(lib, second_lib, first, second, experiment, outfile)
+        #    except:
+        #        print(f"Issue with {lib} and {second_lib}")
 
 
 def get_debug_file(debug_info, path):
