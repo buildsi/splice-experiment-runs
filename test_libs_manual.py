@@ -1,15 +1,12 @@
 # Find any .so libraries in a dest and move to a source.
 
 import argparse
+import json
 import os
 import sys
-import fnmatch
-import shutil
-import json
 
 import spliced.experiment.manual
 import spliced.utils as utils
-from spliced.logger import logger
 
 # Test libs manual takes an input directory and subdirectory pattern
 # to match, and then compares all pairs within it.

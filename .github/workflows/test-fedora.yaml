@@ -10,7 +10,11 @@ on:
       stop:
         description: 'End index for doing analysis'
         required: true
-        default: 300
+        default: 2000
+
+env:
+  start: 1600
+  stop: 1650
 
 jobs:
   build:
@@ -21,10 +25,10 @@ jobs:
       fail-fast: false
       matrix:
         # container, compiler inside to use, and name+version to save
-        container: [['ghcr.io/buildsi/fedora:fedora-34', "34"],
-                    ['ghcr.io/buildsi/fedora:fedora-35', "35"],
-                    ['ghcr.io/buildsi/fedora:fedora-36', "36"],
-                    ['ghcr.io/buildsi/fedora:fedora-37', "37"]]
+        container: [['ghcr.io/buildsi/fedora-34', "34"],
+                    ['ghcr.io/buildsi/fedora-35', "35"],
+                    ['ghcr.io/buildsi/fedora-36', "36"],
+                    ['ghcr.io/buildsi/fedora-37', "37"]]
 
     container:
       image: ${{ matrix.container[0] }}
@@ -144,14 +148,14 @@ jobs:
 
     - name: Compare Matching Libs
       env:
-        start: ${{ inputs.start != '' || 350 }}
-        stop: ${{ inputs.stop != '' || 375 }}
+        start: ${{ inputs.start != '' || env.start }}
+        stop: ${{ inputs.stop != '' || env.stop }}
       run: |
-        # Ensure we can see Python installs
         export PATH=/opt/conda/bin:$HOME/.local/bin:$PATH
         results_dir=/tmp/results
         cache_dir=/tmp/cache
         mkdir -p ${results_dir} ${cache_dir}
+        # cache will save time but take up more space
         export SPLICED_SMEAGLE_CACHE_DIR=${cache_dir}
         export SPLICED_ABILAB_CACHE_DIR=${cache_dir}
         printf "Results: ${results_dir}\n"
@@ -163,7 +167,6 @@ jobs:
         export LIBABIGAIL_DEBUGINFO_DIR2=$PWD/second/usr/lib/debug
         export ABILAB_DEBUGINFO_DIR1=$PWD/first/usr/lib/debug
         export ABILAB_DEBUGINFO_DIR2=$PWD/second/usr/lib/debug
-        #export ABILAB_DISABLE_REPORTS=true
         printf "/opt/conda/bin/python test_libs.py ./first ./second --os_a ${{ matrix.artifacts[0] }} --os_b ${{ matrix.artifacts[1] }} --outdir ${outdir} --start ${{ env.start }} --stop ${{ env.stop }}\n"
         /opt/conda/bin/python test_libs.py ./first ./second --os_a ${{ matrix.artifacts[0] }} --os_b ${{ matrix.artifacts[1] }} --outdir ${outdir} --start ${{ env.start }} --stop ${{ env.stop }}
 
